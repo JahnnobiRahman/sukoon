@@ -14,7 +14,7 @@
 <style>
   :root {
     --navy: #1f2f4a; --navy-2: #2b4166; --amber: #e0a030;
-    --bg: #e9edf2; --mine: #dbe7fb; --theirs: #ffffff; --ink: #1c2430; --muted: #6b7686;
+    --bg: #e9edf2; --mine: #dbe7fb; --theirs: #ffffff; --ink: #1c2430; --muted: #6b7686; --line: #c9d1dc;
   }
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   html, body { height: 100%; margin: 0; overscroll-behavior: none; }
@@ -28,48 +28,78 @@
   .card h1 { margin: 0 0 4px; font-size: 22px; color: var(--navy); }
   .card p { margin: 0 0 18px; color: var(--muted); font-size: 14px; }
   .card label { display: block; font-size: 13px; font-weight: 600; margin: 12px 0 6px; }
-  .card input { width: 100%; padding: 12px; border: 1px solid #c9d1dc; border-radius: 10px; }
-  .card input:focus, textarea:focus { outline: 2px solid var(--amber); outline-offset: 1px; }
+  .card input { width: 100%; padding: 12px; border: 1px solid var(--line); border-radius: 10px; }
+  input:focus, textarea:focus { outline: 2px solid var(--amber); outline-offset: 1px; }
+  #who2 { display: flex; gap: 10px; }
+  #who2 button { flex: 1; padding: 12px; border: 1px solid var(--line); border-radius: 10px; background: #fff; font-weight: 700; font-size: 17px; cursor: pointer; color: var(--ink); }
+  #who2 button.on { background: var(--navy); border-color: var(--navy); color: #fff; }
   .primary { width: 100%; margin-top: 18px; padding: 13px; border: 0; border-radius: 10px; background: var(--navy); color: #fff; font-weight: 600; cursor: pointer; }
   .primary:disabled { opacity: .6; }
   #loginErr { color: #b3261e; font-size: 14px; min-height: 20px; margin-top: 10px; overflow-wrap: anywhere; }
 
   /* Chat */
   #chat { height: 100%; height: 100dvh; display: flex; flex-direction: column; max-width: 760px; margin: 0 auto; background: var(--bg); }
-  header { background: var(--navy); color: #fff; padding: calc(10px + env(safe-area-inset-top)) 14px 10px; display: flex; align-items: center; gap: 12px; border-bottom: 3px solid var(--amber); }
-  .avatar { flex: none; width: 40px; height: 40px; border-radius: 50%; background: var(--amber); color: var(--navy); font-weight: 700; font-size: 18px; display: flex; align-items: center; justify-content: center; }
+  header { background: var(--navy); color: #fff; padding: calc(10px + env(safe-area-inset-top)) 10px 10px 14px; display: flex; align-items: center; gap: 8px; border-bottom: 3px solid var(--amber); }
+  .avatar { flex: none; width: 40px; height: 40px; border-radius: 50%; background: var(--amber); color: var(--navy); font-weight: 700; font-size: 18px; display: flex; align-items: center; justify-content: center; margin-right: 4px; }
   header .grow { flex: 1; min-width: 0; }
   header .title { font-weight: 700; font-size: 17px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  header .who { font-size: 12px; opacity: .8; }
-  header button { flex: none; background: transparent; border: 1px solid rgba(255,255,255,.4); color: #fff; border-radius: 8px; padding: 6px 10px; font-size: 13px; cursor: pointer; }
+  header .who { font-size: 12px; opacity: .8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .hbtn { flex: none; width: 38px; height: 38px; border-radius: 50%; border: 0; background: transparent; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+  .hbtn svg { width: 21px; height: 21px; }
+  #logoutBtn { flex: none; background: transparent; border: 1px solid rgba(255,255,255,.4); color: #fff; border-radius: 8px; padding: 6px 9px; font-size: 13px; cursor: pointer; }
+
+  #pinbar { display: flex; align-items: center; gap: 8px; width: 100%; text-align: left; border: 0; background: #fff; border-bottom: 1px solid var(--line); padding: 8px 14px; font-size: 13px; cursor: pointer; color: var(--ink); }
+  #pinbar svg { flex: none; width: 16px; height: 16px; }
+  #pinbar span { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  #pinbar em { flex: none; font-style: normal; color: var(--muted); }
+
   #list { flex: 1; overflow-y: auto; padding: 12px 10px 4px; -webkit-overflow-scrolling: touch; }
   .day { text-align: center; margin: 14px 0 10px; }
   .day span { background: #d5dbe4; color: #3c4756; font-size: 12px; padding: 4px 10px; border-radius: 999px; }
   .row { display: flex; margin: 4px 0; }
   .row.mine { justify-content: flex-end; }
-  .bubble { max-width: 78%; min-width: 0; background: var(--theirs); border-radius: 14px 14px 14px 4px; padding: 8px 11px 6px; box-shadow: 0 1px 2px rgba(0,0,0,.08); }
+  .bubble { max-width: 78%; min-width: 0; background: var(--theirs); border-radius: 14px 14px 14px 4px; padding: 8px 11px 6px; box-shadow: 0 1px 2px rgba(0,0,0,.08); cursor: pointer; }
   .mine .bubble { background: var(--mine); border-radius: 14px 14px 4px 14px; }
+  .pending .bubble { opacity: .65; }
   .text { white-space: pre-wrap; overflow-wrap: anywhere; line-height: 1.35; }
+  .text a { color: #1a5fd0; text-decoration: underline; }
   .time { font-size: 11px; color: var(--muted); text-align: right; margin-top: 3px; }
   .stat { margin-left: 6px; font-weight: 600; }
   .stat.seen { color: #1a73e8; }
+  .pinmark { margin-right: 6px; }
+  .pic { display: block; max-width: 100%; max-height: 300px; border-radius: 10px; margin: 2px 0 4px; cursor: zoom-in; }
+  .picwait { width: 180px; height: 120px; border-radius: 10px; background: rgba(0,0,0,.07); display: flex; align-items: center; justify-content: center; color: var(--muted); font-size: 13px; margin: 2px 0 4px; }
+  .voice { display: block; width: 240px; max-width: 100%; height: 40px; margin: 2px 0 4px; }
   .rbtn { flex: none; align-self: center; border: 0; background: none; padding: 6px; cursor: pointer; opacity: .55; }
   .rbtn svg { width: 18px; height: 18px; display: block; }
   .quote { border-left: 3px solid var(--amber); background: rgba(0,0,0,.06); border-radius: 6px; padding: 4px 8px; margin-bottom: 4px; font-size: 13px; cursor: pointer; }
   .quote b { display: block; color: var(--navy-2); font-size: 12px; }
   .quote span { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; overflow-wrap: anywhere; color: #3c4756; }
-  .flash .bubble { animation: flash 1.2s; }
+  .reacts { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
+  .reacts:empty { display: none; }
+  .chip { border: 1px solid var(--line); background: #fff; border-radius: 999px; padding: 1px 7px; font-size: 14px; cursor: pointer; line-height: 1.5; }
+  .chip.me { border-color: var(--amber); background: #fdf3df; }
+  .chip small { font-size: 11px; color: var(--muted); margin-left: 3px; }
+  .flash .bubble { animation: flash 1.4s; }
   @keyframes flash { 0%, 60% { box-shadow: 0 0 0 3px var(--amber); } 100% { box-shadow: 0 1px 2px rgba(0,0,0,.08); } }
   #older { display: block; margin: 4px auto 10px; border: 0; background: #d5dbe4; color: #3c4756; border-radius: 999px; padding: 7px 14px; font-size: 13px; cursor: pointer; }
+  #empty { text-align: center; color: var(--muted); margin-top: 40px; font-size: 14px; }
+  #status { text-align: center; font-size: 12px; color: #b3261e; min-height: 16px; padding: 0 12px; overflow-wrap: anywhere; }
+
   #replybar { display: flex; align-items: center; gap: 10px; margin: 6px 10px 0; padding: 6px 10px; background: #fff; border-left: 3px solid var(--amber); border-radius: 8px; font-size: 13px; }
   #replybar .grow { flex: 1; min-width: 0; }
   #replybar b { display: block; color: var(--navy-2); font-size: 12px; }
   #replybar span { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #3c4756; }
   #replybar button { flex: none; border: 0; background: none; font-size: 20px; line-height: 1; color: var(--muted); cursor: pointer; padding: 4px 6px; }
-  .pending .bubble { opacity: .65; }
-  .pic { display: block; max-width: 100%; max-height: 300px; border-radius: 10px; margin: 2px 0 4px; cursor: zoom-in; }
-  .picwait { width: 180px; height: 120px; border-radius: 10px; background: rgba(0,0,0,.07); display: flex; align-items: center; justify-content: center; color: var(--muted); font-size: 13px; margin: 2px 0 4px; }
-  .voice { display: block; width: 240px; max-width: 100%; height: 40px; margin: 2px 0 4px; }
+  #preview { padding: 8px 12px 0; display: flex; align-items: center; gap: 10px; }
+  #preview img { height: 64px; border-radius: 8px; }
+  #preview button { border: 0; background: #d5dbe4; border-radius: 8px; padding: 6px 10px; cursor: pointer; }
+  #composer { display: flex; align-items: flex-end; gap: 6px; padding: 8px 8px calc(10px + env(safe-area-inset-bottom)); }
+  #composer textarea { flex: 1; min-width: 0; resize: none; border: 1px solid var(--line); border-radius: 22px; padding: 11px 14px; max-height: 120px; line-height: 1.3; background: #fff; }
+  .round { flex: none; width: 44px; height: 44px; border-radius: 50%; border: 0; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+  #picBtn, #micBtn { background: #fff; border: 1px solid var(--line); }
+  #sendBtn { background: var(--navy); }
+  .round svg { width: 22px; height: 22px; }
   #recbar { display: flex; align-items: center; gap: 10px; padding: 8px 10px calc(10px + env(safe-area-inset-bottom)); }
   #recbar .dot { width: 12px; height: 12px; border-radius: 50%; background: #d93025; animation: blink 1s infinite; }
   #recbar .lbl { flex: 1; font-weight: 600; }
@@ -77,23 +107,31 @@
   #recCancel { background: #d5dbe4; color: var(--ink); }
   #recSend { background: var(--navy); color: #fff; }
   @keyframes blink { 50% { opacity: .25; } }
-  #micBtn { background: #fff; border: 1px solid #c9d1dc; }
-  #empty { text-align: center; color: var(--muted); margin-top: 40px; font-size: 14px; }
-  #status { text-align: center; font-size: 12px; color: #b3261e; min-height: 16px; padding: 0 12px; overflow-wrap: anywhere; }
 
-  #preview { padding: 8px 12px 0; display: flex; align-items: center; gap: 10px; }
-  #preview img { height: 64px; border-radius: 8px; }
-  #preview button { border: 0; background: #d5dbe4; border-radius: 8px; padding: 6px 10px; cursor: pointer; }
-  #composer { display: flex; align-items: flex-end; gap: 8px; padding: 8px 10px calc(10px + env(safe-area-inset-bottom)); }
-  #composer textarea { flex: 1; resize: none; border: 1px solid #c9d1dc; border-radius: 22px; padding: 11px 14px; max-height: 120px; line-height: 1.3; background: #fff; }
-  .round { flex: none; width: 44px; height: 44px; border-radius: 50%; border: 0; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-  #picBtn { background: #fff; border: 1px solid #c9d1dc; }
-  #sendBtn { background: var(--navy); }
-  #sendBtn:disabled { opacity: .5; }
-  .round svg { width: 22px; height: 22px; }
-
-  #viewer { position: fixed; inset: 0; background: rgba(0,0,0,.92); display: flex; align-items: center; justify-content: center; z-index: 10; cursor: zoom-out; }
+  /* Overlays */
+  #viewer { position: fixed; inset: 0; background: rgba(0,0,0,.92); display: flex; align-items: center; justify-content: center; z-index: 30; cursor: zoom-out; }
   #viewer img { max-width: 100%; max-height: 100%; }
+  .shade { position: fixed; inset: 0; background: rgba(15,23,36,.45); z-index: 20; display: flex; align-items: flex-end; justify-content: center; }
+  #sheet .box { width: 100%; max-width: 760px; background: #fff; border-radius: 18px 18px 0 0; padding: 14px 14px calc(14px + env(safe-area-inset-bottom)); }
+  #emojis { display: flex; justify-content: space-between; margin-bottom: 10px; }
+  #emojis button { border: 0; background: #f1f3f6; border-radius: 50%; width: 46px; height: 46px; font-size: 24px; cursor: pointer; }
+  #emojis button.on { background: #fdf3df; box-shadow: inset 0 0 0 2px var(--amber); }
+  .act { display: block; width: 100%; text-align: left; border: 0; background: none; padding: 13px 6px; font-size: 16px; cursor: pointer; border-top: 1px solid #edf0f4; color: var(--ink); }
+  #panel { align-items: stretch; }
+  #panel .box { width: 100%; max-width: 760px; background: var(--bg); display: flex; flex-direction: column; }
+  #panel .top { background: var(--navy); color: #fff; display: flex; align-items: center; gap: 8px; padding: calc(10px + env(safe-area-inset-top)) 10px 10px 16px; border-bottom: 3px solid var(--amber); }
+  #panel .top b { flex: 1; font-size: 17px; }
+  #panel .top button { border: 1px solid rgba(255,255,255,.4); background: transparent; color: #fff; border-radius: 8px; padding: 6px 10px; font-size: 13px; cursor: pointer; }
+  #searchForm { display: flex; gap: 8px; padding: 10px; }
+  #searchForm input { flex: 1; min-width: 0; padding: 11px 14px; border: 1px solid var(--line); border-radius: 22px; }
+  #searchForm button { border: 0; background: var(--navy); color: #fff; border-radius: 22px; padding: 0 16px; font-weight: 600; cursor: pointer; }
+  #panelList { flex: 1; overflow-y: auto; padding: 4px 10px 16px; }
+  .item { display: flex; align-items: center; gap: 8px; background: #fff; border-radius: 12px; padding: 10px 12px; margin: 6px 0; cursor: pointer; box-shadow: 0 1px 2px rgba(0,0,0,.06); }
+  .item .grow { flex: 1; min-width: 0; }
+  .item small { display: block; color: var(--muted); font-size: 12px; margin-bottom: 2px; }
+  .item span { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; overflow-wrap: anywhere; }
+  .item button { flex: none; border: 0; background: #edf0f4; border-radius: 8px; padding: 6px 10px; font-size: 13px; cursor: pointer; }
+  .note { text-align: center; color: var(--muted); font-size: 14px; margin-top: 30px; padding: 0 20px; }
 </style>
 </head>
 <body>
@@ -101,9 +139,9 @@
 <div id="login" class="hidden">
   <form class="card" id="loginForm">
     <h1>Sukoon</h1>
-    <p>Enter your name and the passcode you both share.</p>
-    <label for="nameIn">Your name</label>
-    <input id="nameIn" maxlength="30" autocomplete="off" required>
+    <p>Choose who you are and enter the passcode.</p>
+    <label>Who are you?</label>
+    <div id="who2"></div>
     <label for="passIn">Passcode</label>
     <input id="passIn" type="password" autocomplete="off" required>
     <button class="primary" id="loginBtn" type="submit">Enter chat</button>
@@ -118,8 +156,18 @@
       <div class="title" id="title">Sukoon</div>
       <div class="who" id="who"></div>
     </div>
+    <button class="hbtn" id="searchBtn" type="button" aria-label="Search messages">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+    </button>
+    <button class="hbtn" id="pinsBtn" type="button" aria-label="Pinned messages">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4h6l-1 6 3 3H7l3-3z"/><path d="M12 13v7"/></svg>
+    </button>
     <button id="logoutBtn" type="button">Sign out</button>
   </header>
+  <button id="pinbar" class="hidden" type="button">
+    <svg viewBox="0 0 24 24" fill="none" stroke="#e0a030" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4h6l-1 6 3 3H7l3-3z"/><path d="M12 13v7"/></svg>
+    <span id="pinText"></span><em id="pinCount"></em>
+  </button>
   <div id="list"></div>
   <div id="status"></div>
   <div id="replybar" class="hidden">
@@ -151,19 +199,48 @@
   <input id="fileIn" type="file" accept="image/*" class="hidden">
 </div>
 
+<!-- Message menu: reactions, reply, pin, copy -->
+<div id="sheet" class="shade hidden">
+  <div class="box">
+    <div id="emojis"></div>
+    <button class="act" id="actReply" type="button">Reply</button>
+    <button class="act" id="actPin" type="button">Pin</button>
+    <button class="act" id="actCopy" type="button">Copy text</button>
+    <button class="act" id="actClose" type="button">Cancel</button>
+  </div>
+</div>
+
+<!-- Search and pinned messages -->
+<div id="panel" class="shade hidden">
+  <div class="box">
+    <div class="top"><b id="panelTitle"></b><button id="panelClose" type="button">Close</button></div>
+    <form id="searchForm">
+      <input id="searchIn" type="search" placeholder="Search messages" autocomplete="off">
+      <button type="submit">Search</button>
+    </form>
+    <div id="panelList"></div>
+  </div>
+</div>
+
 <div id="viewer" class="hidden"><img id="viewerImg" alt="Picture"></div>
 
 <script src="config.js"></script>
 <script>
   var API = (window.CHAT_API || '').trim();
-  var KEEP = 500, firstRow = 0, replyTo = null, loadingOlder = false, hotUntil = 0, wantPoll = false, queue = [], pendingEls = [];
-  var me = '', pass = '', lastRow = 0, lastDay = '', busy = false, sending = false, timer = null;
-  var pendingPic = '', picCache = {}, items = [];
+  var USERS = ['MH', 'JH'], pick = '';
+  var KEEP = 500, EMOJIS = ['👍', '❤️', '😂', '😮', '😢', '🙏'];
+  var me = '', pass = '', lastRow = 0, firstRow = 0, lastDay = '', busy = false, sending = false, timer = null;
+  var pendingPic = '', picCache = {}, items = [], byId = {};
   var seenRow = 0, otherDelivered = 0, otherSeen = 0, otherName = '';
+  var hotUntil = 0, wantPoll = false, queue = [], pendingEls = [];
+  var replyTo = null, loadingOlder = false, rv = null, pv = -1, pins = [], sheetMsg = null;
 
   function $(id) { return document.getElementById(id); }
   function store(k, v) { try { if (v === null) localStorage.removeItem(k); else localStorage.setItem(k, v); } catch (e) {} }
   function load(k) { try { return localStorage.getItem(k) || ''; } catch (e) { return ''; } }
+  function same(a, b) { return String(a || '').trim().toLowerCase() === String(b || '').trim().toLowerCase(); }
+  function isMe(name) { return same(name, me); }
+  function errText(err) { return String(err && err.message || err); }
 
   // ---------- Talking to the Google script ----------
   function api(action, data) {
@@ -179,9 +256,9 @@
         return j.data;
       });
   }
-  function isWrongPass(err) { return String(err && err.message || err).indexOf('WRONG_PASSCODE') !== -1; }
+  function isWrongPass(err) { var t = errText(err); return t.indexOf('WRONG_PASSCODE') !== -1 || t.indexOf('UNKNOWN_NAME') !== -1; }
 
-  // ---------- Pictures kept on this device so they open instantly ----------
+  // ---------- Pictures and voice kept on this device so they open instantly ----------
   var dbP = null;
   function db() {
     if (dbP) return dbP;
@@ -212,23 +289,48 @@
   }
 
   // ---------- Sign in ----------
+  function known(name) {
+    var found = '';
+    USERS.forEach(function (u) { if (same(u, name)) found = u; });
+    return found;
+  }
+  function setPick(name) {
+    pick = known(name);
+    var bs = $('who2').children;
+    for (var i = 0; i < bs.length; i++) bs[i].className = bs[i].textContent === pick ? 'on' : '';
+  }
+  USERS.forEach(function (u) {
+    var b = document.createElement('button'); b.type = 'button'; b.textContent = u;
+    b.addEventListener('click', function () { setPick(u); $('loginErr').textContent = ''; });
+    $('who2').appendChild(b);
+  });
+
   $('loginForm').addEventListener('submit', function (ev) {
     ev.preventDefault();
-    var n = $('nameIn').value.trim(), p = $('passIn').value;
-    if (!n || !p) return;
+    var n = pick, p = $('passIn').value;
+    if (!n) { $('loginErr').textContent = 'Please choose ' + USERS.join(' or ') + ' first.'; return; }
+    if (!p) return;
     $('loginBtn').disabled = true;
     $('loginErr').textContent = '';
-    api('getMessages', { pass: p, after: 0, name: n, seen: 0 }).then(function (res) {
+    api('getMessages', { pass: p, after: 0, name: '', seen: 0 }).then(function (res) {
       $('loginBtn').disabled = false;
-      me = n; pass = p;
-      store('chatName', n); store('chatPass', p);
+      // Sides are decided by name, so keep to the names already used in this chat
+      var names = (res.names || []).filter(Boolean), match = '';
+      names.forEach(function (x) { if (same(x, n)) match = x; });
+      if (!match && names.length >= 2) {
+        $('loginErr').textContent = 'This chat already has: ' + names.join(', ') + '. Please type your name exactly as one of these.';
+        return;
+      }
+      me = match || n; pass = p;
+      store('chatName', me); store('chatPass', p);
       openChat();
       resetList();
       addMessages(res, true);
       startPolling();
+      poll();
     }).catch(function (err) {
       $('loginBtn').disabled = false;
-      $('loginErr').textContent = isWrongPass(err) ? 'Wrong passcode. Please try again.' : 'Could not connect: ' + String(err && err.message || err);
+      $('loginErr').textContent = isWrongPass(err) ? 'Wrong passcode. Please try again.' : 'Could not connect: ' + errText(err);
     });
   });
 
@@ -240,9 +342,10 @@
 
   function showLogin(msg) {
     stopPolling();
+    closeSheet(); closePanel();
     $('chat').classList.add('hidden');
     $('login').classList.remove('hidden');
-    $('nameIn').value = load('chatName');
+    setPick(load('chatName'));
     $('passIn').value = '';
     $('loginErr').textContent = msg || '';
   }
@@ -257,7 +360,10 @@
 
   // ---------- Messages ----------
   function resetList() {
-    lastRow = 0; lastDay = ''; firstRow = 0; setReply(null); seenRow = 0; otherDelivered = 0; otherSeen = 0; items = []; otherName = ''; queue = []; pendingEls = [];
+    lastRow = 0; firstRow = 0; lastDay = ''; seenRow = 0; otherDelivered = 0; otherSeen = 0;
+    items = []; byId = {}; otherName = ''; queue = []; pendingEls = [];
+    rv = null; pv = -1; pins = [];
+    setReply(null); paintPins();
     var list = $('list');
     while (list.firstChild) list.removeChild(list.firstChild);
     var empty = document.createElement('div');
@@ -273,7 +379,7 @@
 
   function saveCache() {
     var keep = items.length > KEEP ? items.slice(items.length - KEEP) : items;
-    store('chatCache', JSON.stringify({ items: keep, last: lastRow, d: otherDelivered, s: otherSeen }));
+    store('chatCache', JSON.stringify({ items: keep, last: lastRow, d: otherDelivered, s: otherSeen, rv: rv }));
   }
 
   function dayLabel(d) {
@@ -282,22 +388,42 @@
     if (d.toDateString() === y.toDateString()) return 'Yesterday';
     return d.toLocaleDateString([], { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
   }
+  function timeLabel(t) {
+    var d = new Date(t);
+    return d.toLocaleDateString([], { day: 'numeric', month: 'short', year: 'numeric' }) + ', ' + d.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+  }
 
   function snippet(m) {
     return m.text ? String(m.text).slice(0, 140) : m.pic ? 'Picture' : m.voice ? 'Voice message' : '';
   }
 
+  // Turns web addresses inside a message into links that open in the browser
+  function fillText(el, text) {
+    var re = /((?:https?:\/\/|www\.)[^\s<>"']+)/gi, pos = 0, m;
+    while ((m = re.exec(text))) {
+      var url = m[1], tail = '';
+      var cut = /[.,!?;:)\]]+$/.exec(url);
+      if (cut) { tail = cut[0]; url = url.slice(0, url.length - tail.length); }
+      if (m.index > pos) el.appendChild(document.createTextNode(text.slice(pos, m.index)));
+      var a = document.createElement('a');
+      a.href = /^www\./i.test(url) ? 'https://' + url : url;
+      a.target = '_blank'; a.rel = 'noopener noreferrer';
+      a.textContent = url;
+      el.appendChild(a);
+      if (tail) el.appendChild(document.createTextNode(tail));
+      pos = m.index + m[1].length;
+    }
+    if (pos < text.length) el.appendChild(document.createTextNode(text.slice(pos)));
+  }
+
+  function rowOf(id) { return document.querySelector('.row[data-row="' + Number(id) + '"]'); }
+
   function makeQuote(r) {
     var q = document.createElement('div'); q.className = 'quote';
-    var nm = document.createElement('b'); nm.textContent = r.name === me ? 'You' : r.name;
+    var nm = document.createElement('b'); nm.textContent = isMe(r.name) ? 'You' : r.name;
     var tx = document.createElement('span'); tx.textContent = r.text;
     q.appendChild(nm); q.appendChild(tx);
-    q.addEventListener('click', function () {
-      var target = document.querySelector('.row[data-row="' + Number(r.id) + '"]');
-      if (!target) { setStatus('That message is further up. Tap "Load earlier messages" to find it.'); return; }
-      target.scrollIntoView({ block: 'center', behavior: 'smooth' });
-      target.classList.remove('flash'); void target.offsetWidth; target.classList.add('flash');
-    });
+    q.addEventListener('click', function () { jumpTo(r.id); });
     return q;
   }
 
@@ -309,17 +435,19 @@
   }
 
   function buildRow(m) {
+    byId[m.id] = m;
     var d = new Date(m.t);
-    var mine = m.name === me;
+    var mine = isMe(m.name);
     var row = document.createElement('div'); row.className = 'row' + (mine ? ' mine' : '');
     row.setAttribute('data-row', m.id);
     var b = document.createElement('div'); b.className = 'bubble';
     if (m.reply && m.reply.id) b.appendChild(makeQuote(m.reply));
     if (m.pic) b.appendChild(makePic(m.pic));
     if (m.voice) b.appendChild(makeVoice(m.voice));
-    if (m.text) { var tx = document.createElement('div'); tx.className = 'text'; tx.textContent = m.text; b.appendChild(tx); }
+    if (m.text) { var tx = document.createElement('div'); tx.className = 'text'; fillText(tx, m.text); b.appendChild(tx); }
     var tm = document.createElement('div'); tm.className = 'time';
-    tm.textContent = d.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+    var pm = document.createElement('span'); pm.className = 'pinmark'; tm.appendChild(pm);
+    tm.appendChild(document.createTextNode(d.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })));
     tm.title = d.toLocaleString();
     if (mine) {
       var st = document.createElement('span'); st.className = 'stat';
@@ -327,6 +455,13 @@
       tm.appendChild(st);
     }
     b.appendChild(tm);
+    var rc = document.createElement('div'); rc.className = 'reacts'; b.appendChild(rc);
+    paintReacts(rc, m);
+    // Tapping the bubble opens the menu (reactions, reply, pin, copy)
+    b.addEventListener('click', function (ev) {
+      if (ev.target.closest('a, img, audio, .quote, .chip, button')) return;
+      openSheet(m);
+    });
     var rb = document.createElement('button'); rb.type = 'button'; rb.className = 'rbtn';
     rb.setAttribute('aria-label', 'Reply to this message');
     rb.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="#6b7686" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14L4 9l5-5"/><path d="M4 9h10a6 6 0 0 1 6 6v4"/></svg>';
@@ -335,17 +470,9 @@
     return row;
   }
 
-  function setReply(r) {
-    replyTo = r;
-    if (!r) { $('replybar').classList.add('hidden'); return; }
-    $('replyName').textContent = 'Replying to ' + (r.name === me ? 'yourself' : r.name);
-    $('replyText').textContent = r.text;
-    $('replybar').classList.remove('hidden');
-  }
-  $('replyCancel').addEventListener('click', function () { setReply(null); });
-
   function addMessages(res, forceScroll) {
     if (!res) return;
+    if (res.resync) { fullReload(); return; }
     var list = $('list');
     var nearBottom = list.scrollHeight - list.scrollTop - list.clientHeight < 120;
     var added = false, mineAdded = false;
@@ -358,74 +485,36 @@
       var d = new Date(m.t);
       var dayKey = d.toDateString();
       if (dayKey !== lastDay) { lastDay = dayKey; list.appendChild(daySep(d)); }
-      var mine = m.name === me;
+      var mine = isMe(m.name);
       if (!mine && m.name) otherName = m.name;
       if (mine && pendingEls.length) { var old = pendingEls.shift(); if (old.parentNode) old.parentNode.removeChild(old); }
       list.appendChild(buildRow(m));
       added = true; if (mine) mineAdded = true;
     });
     if (res.last > lastRow) lastRow = res.last;
-    var statusChanged = false;
+    var changed = false;
     if (res.status) {
       var nd = Math.max(otherDelivered, res.status.delivered || 0);
       var ns = Math.max(otherSeen, res.status.seen || 0);
-      statusChanged = nd !== otherDelivered || ns !== otherSeen;
+      changed = nd !== otherDelivered || ns !== otherSeen;
       otherDelivered = nd; otherSeen = ns;
     }
+    if (res.rx && res.rx.length) { res.rx.forEach(function (e) { applyRx(e.id, e.r); }); changed = true; }
+    if (typeof res.rv === 'number' && res.rv !== rv) { rv = res.rv; changed = true; }
+    if (res.pins) { pins = res.pins; pv = res.pv; paintPins(); }
     paintStatus();
     setTitle();
     showOlderButton();
-    if (added || statusChanged) { saveCache(); hotUntil = Date.now() + 30000; }
+    if (added || changed) { saveCache(); }
+    if (added) hotUntil = Date.now() + 30000;
     if (added && (forceScroll || nearBottom || mineAdded)) scrollDown();
   }
 
-  // ---------- Earlier messages ----------
-  function showOlderButton() {
-    var btn = $('older');
-    if (firstRow > 2) {
-      if (!btn) {
-        btn = document.createElement('button'); btn.id = 'older'; btn.type = 'button';
-        btn.textContent = 'Load earlier messages';
-        btn.addEventListener('click', loadOlder);
-        $('list').insertBefore(btn, $('list').firstChild);
-      }
-    } else if (btn) btn.remove();
-  }
-
-  function loadOlder() {
-    if (loadingOlder || firstRow <= 2) return;
-    loadingOlder = true;
-    var btn = $('older'); if (btn) btn.textContent = 'Loading…';
-    api('getOlder', { pass: pass, before: firstRow, count: 300 }).then(function (res) {
-      loadingOlder = false;
-      var older = (res && res.items) || [];
-      if (!older.length) { firstRow = 2; showOlderButton(); return; }
-      var list = $('list');
-      var frag = document.createDocumentFragment(), prevDay = '';
-      older.forEach(function (m) {
-        var d = new Date(m.t), k = d.toDateString();
-        if (k !== prevDay) { prevDay = k; frag.appendChild(daySep(d)); }
-        if (m.name !== me && m.name && !otherName) otherName = m.name;
-        frag.appendChild(buildRow(m));
-      });
-      var b = $('older');
-      var after = b ? b.nextSibling : list.firstChild;
-      // Avoid showing the same date heading twice where the old and new parts meet
-      if (after && after.classList && after.classList.contains('day') && after.getAttribute('data-day') === prevDay) {
-        var dup = after; after = after.nextSibling; dup.remove();
-      }
-      var before = list.scrollHeight;
-      list.insertBefore(frag, after);
-      list.scrollTop += list.scrollHeight - before;
-      items = older.concat(items);
-      firstRow = older[0].id;
-      if (b) b.textContent = 'Load earlier messages';
-      paintStatus(); setTitle(); showOlderButton();
-    }).catch(function (err) {
-      loadingOlder = false;
-      var b = $('older'); if (b) b.textContent = 'Load earlier messages';
-      setStatus('Could not load earlier messages: ' + String(err && err.message || err));
-    });
+  function fullReload() {
+    store('chatCache', null);
+    resetList();
+    api('getMessages', { pass: pass, after: 0, name: me, seen: 0 }).then(function (res) { addMessages(res, true); })
+      .catch(function (err) { if (isWrongPass(err)) signOut('Please sign in again.'); });
   }
 
   // Sent -> Delivered -> Seen on my own messages
@@ -441,41 +530,277 @@
 
   function scrollDown() { var list = $('list'); list.scrollTop = list.scrollHeight; }
 
+  // ---------- Earlier messages ----------
+  function showOlderButton() {
+    var btn = $('older');
+    if (firstRow > 2) {
+      if (!btn) {
+        btn = document.createElement('button'); btn.id = 'older'; btn.type = 'button';
+        btn.textContent = 'Load earlier messages';
+        btn.addEventListener('click', function () { loadOlder(300); });
+        $('list').insertBefore(btn, $('list').firstChild);
+      }
+    } else if (btn) btn.remove();
+  }
+
+  function loadOlder(count) {
+    if (loadingOlder || firstRow <= 2) return Promise.resolve(false);
+    loadingOlder = true;
+    var btn = $('older'); if (btn) btn.textContent = 'Loading…';
+    return api('getOlder', { pass: pass, before: firstRow, count: count || 300 }).then(function (res) {
+      loadingOlder = false;
+      var older = (res && res.items) || [];
+      if (!older.length) { firstRow = 2; showOlderButton(); return false; }
+      var list = $('list');
+      var frag = document.createDocumentFragment(), prevDay = '';
+      older.forEach(function (m) {
+        var d = new Date(m.t), k = d.toDateString();
+        if (k !== prevDay) { prevDay = k; frag.appendChild(daySep(d)); }
+        if (!isMe(m.name) && m.name && !otherName) otherName = m.name;
+        frag.appendChild(buildRow(m));
+      });
+      var b = $('older');
+      var after = b ? b.nextSibling : list.firstChild;
+      // Avoid showing the same date heading twice where the old and new parts meet
+      if (after && after.classList && after.classList.contains('day') && after.getAttribute('data-day') === prevDay) {
+        var dup = after; after = after.nextSibling; dup.remove();
+      }
+      var before = list.scrollHeight;
+      list.insertBefore(frag, after);
+      list.scrollTop += list.scrollHeight - before;
+      items = older.concat(items);
+      firstRow = older[0].id;
+      if (b) b.textContent = 'Load earlier messages';
+      paintStatus(); paintPins(); setTitle(); showOlderButton();
+      return true;
+    }).catch(function (err) {
+      loadingOlder = false;
+      var b = $('older'); if (b) b.textContent = 'Load earlier messages';
+      setStatus('Could not load earlier messages: ' + errText(err));
+      return false;
+    });
+  }
+
+  // Scrolls to a message, loading earlier messages first if it is further back
+  function jumpTo(id) {
+    id = Number(id);
+    var target = rowOf(id);
+    if (target) {
+      setStatus('');
+      target.scrollIntoView({ block: 'center' });
+      target.classList.remove('flash'); void target.offsetWidth; target.classList.add('flash');
+      return;
+    }
+    if (!(id >= 2) || id >= firstRow || firstRow <= 2) { setStatus('That message could not be found.'); return; }
+    setStatus('Finding that message…');
+    loadOlder(Math.min(500, firstRow - id + 30)).then(function (ok) {
+      if (ok) jumpTo(id); else setStatus('That message could not be found.');
+    });
+  }
+
+  // ---------- Pictures and voice inside messages ----------
+  function fetchMedia(id) {
+    if (picCache[id]) return Promise.resolve(picCache[id]);
+    return picLoad(id).then(function (saved) {
+      if (saved) { picCache[id] = saved; return saved; }
+      return api('getPicture', { pass: pass, id: id }).then(function (src) { picSave(id, src); picCache[id] = src; return src; });
+    });
+  }
+
   function makePic(id) {
     var wait = document.createElement('div'); wait.className = 'picwait'; wait.textContent = 'Loading picture…';
-    function show(src) {
-      picCache[id] = src;
+    fetchMedia(id).then(function (src) {
       var img = document.createElement('img'); img.className = 'pic'; img.alt = 'Shared picture'; img.src = src;
       var list = $('list');
       var nearBottom = list.scrollHeight - list.scrollTop - list.clientHeight < 200;
       img.addEventListener('load', function () { if (nearBottom) scrollDown(); });
       img.addEventListener('click', function () { $('viewerImg').src = src; $('viewer').classList.remove('hidden'); });
       if (wait.parentNode) wait.parentNode.replaceChild(img, wait);
-    }
-    if (picCache[id]) { setTimeout(function () { show(picCache[id]); }, 0); return wait; }
-    picLoad(id).then(function (saved) {
-      if (saved) { show(saved); return; }
-      return api('getPicture', { pass: pass, id: id }).then(function (src) { picSave(id, src); show(src); });
     }).catch(function () { wait.textContent = 'Picture could not load'; });
     return wait;
   }
 
   function makeVoice(id) {
     var wait = document.createElement('div'); wait.className = 'text'; wait.textContent = 'Loading voice message…';
-    function show(src) {
-      picCache[id] = src;
+    fetchMedia(id).then(function (src) {
       var a = document.createElement('audio'); a.className = 'voice'; a.controls = true; a.preload = 'metadata'; a.src = src;
       if (wait.parentNode) wait.parentNode.replaceChild(a, wait);
-    }
-    if (picCache[id]) { setTimeout(function () { show(picCache[id]); }, 0); return wait; }
-    picLoad(id).then(function (saved) {
-      if (saved) { show(saved); return; }
-      return api('getPicture', { pass: pass, id: id }).then(function (src) { picSave(id, src); show(src); });
     }).catch(function () { wait.textContent = 'Voice message could not load'; });
     return wait;
   }
 
   $('viewer').addEventListener('click', function () { $('viewer').classList.add('hidden'); });
+
+  // ---------- Emoji reactions ----------
+  function paintReacts(box, m) {
+    while (box.firstChild) box.removeChild(box.firstChild);
+    var r = m.rx || {}, counts = {}, mineEmoji = '';
+    Object.keys(r).forEach(function (n) {
+      counts[r[n]] = (counts[r[n]] || 0) + 1;
+      if (isMe(n)) mineEmoji = r[n];
+    });
+    Object.keys(counts).forEach(function (e) {
+      var c = document.createElement('button'); c.type = 'button';
+      c.className = 'chip' + (e === mineEmoji ? ' me' : '');
+      c.appendChild(document.createTextNode(e));
+      if (counts[e] > 1) { var s = document.createElement('small'); s.textContent = counts[e]; c.appendChild(s); }
+      c.setAttribute('aria-label', 'Reaction ' + e);
+      c.addEventListener('click', function () { sendReact(m, e); });
+      box.appendChild(c);
+    });
+  }
+
+  function applyRx(id, r) {
+    var m = byId[id];
+    if (!m) return;
+    m.rx = r || {};
+    var row = rowOf(id);
+    if (row) paintReacts(row.querySelector('.reacts'), m);
+  }
+
+  function myReaction(m) {
+    var r = m.rx || {}, found = '';
+    Object.keys(r).forEach(function (n) { if (isMe(n)) found = r[n]; });
+    return found;
+  }
+
+  // Shows the reaction at once; tapping the same emoji again removes it
+  function sendReact(m, emoji) {
+    var r = {}, old = m.rx || {};
+    Object.keys(old).forEach(function (n) { if (!isMe(n)) r[n] = old[n]; });
+    if (myReaction(m) !== emoji) r[me] = emoji;
+    applyRx(m.id, r);
+    api('react', { pass: pass, name: me, id: m.id, emoji: emoji }).then(function (res) {
+      applyRx(res.id, res.r); saveCache();
+    }).catch(function (err) {
+      applyRx(m.id, old);
+      setStatus('Reaction not saved: ' + errText(err));
+    });
+  }
+
+  // ---------- Message menu ----------
+  (function () {
+    EMOJIS.forEach(function (e) {
+      var b = document.createElement('button'); b.type = 'button'; b.textContent = e;
+      b.setAttribute('data-emoji', e);
+      b.addEventListener('click', function () { var m = sheetMsg; closeSheet(); if (m) sendReact(m, e); });
+      $('emojis').appendChild(b);
+    });
+  })();
+
+  function isPinned(id) { return pins.some(function (p) { return p.id === id; }); }
+
+  function openSheet(m) {
+    sheetMsg = m;
+    var mineEmoji = myReaction(m);
+    var bs = $('emojis').children;
+    for (var i = 0; i < bs.length; i++) bs[i].className = bs[i].getAttribute('data-emoji') === mineEmoji ? 'on' : '';
+    $('actPin').textContent = isPinned(m.id) ? 'Unpin' : 'Pin';
+    $('actCopy').classList.toggle('hidden', !m.text);
+    $('sheet').classList.remove('hidden');
+  }
+  function closeSheet() { sheetMsg = null; $('sheet').classList.add('hidden'); }
+  $('sheet').addEventListener('click', function (ev) { if (ev.target === $('sheet')) closeSheet(); });
+  $('actClose').addEventListener('click', closeSheet);
+  $('actReply').addEventListener('click', function () {
+    var m = sheetMsg; closeSheet();
+    if (m) { setReply({ id: m.id, name: m.name, text: snippet(m) }); msgIn.focus(); }
+  });
+  $('actCopy').addEventListener('click', function () {
+    var m = sheetMsg; closeSheet();
+    if (m && navigator.clipboard) navigator.clipboard.writeText(m.text).catch(function () {});
+  });
+  $('actPin').addEventListener('click', function () {
+    var m = sheetMsg; closeSheet();
+    if (m) setPin(m.id, !isPinned(m.id));
+  });
+
+  // ---------- Pinned messages ----------
+  function setPin(id, on) {
+    api('pin', { pass: pass, id: id, on: on }).then(function (res) {
+      pins = res.pins || []; pv = res.pv; paintPins();
+      if (!$('panel').classList.contains('hidden') && panelMode === 'pins') showPins();
+    }).catch(function (err) { setStatus('Could not change the pin: ' + errText(err)); });
+  }
+
+  function paintPins() {
+    var marks = document.querySelectorAll('.pinmark');
+    for (var i = 0; i < marks.length; i++) {
+      var row = marks[i].closest('.row');
+      var on = row && isPinned(Number(row.getAttribute('data-row')));
+      var want = on ? 'Pinned ·' : '';
+      if (marks[i].textContent !== want) marks[i].textContent = want;
+    }
+    if (!pins.length) { $('pinbar').classList.add('hidden'); return; }
+    var p = pins[pins.length - 1];
+    $('pinText').textContent = (isMe(p.name) ? 'You' : p.name) + ': ' + p.text;
+    $('pinCount').textContent = pins.length > 1 ? pins.length + ' pinned' : 'Pinned';
+    $('pinbar').classList.remove('hidden');
+  }
+  $('pinbar').addEventListener('click', showPins);
+  $('pinsBtn').addEventListener('click', showPins);
+
+  // ---------- Search and pinned list (shared screen) ----------
+  var panelMode = '';
+  function openPanel(mode, title) {
+    panelMode = mode;
+    $('panelTitle').textContent = title;
+    $('searchForm').classList.toggle('hidden', mode !== 'search');
+    $('panel').classList.remove('hidden');
+  }
+  function closePanel() { $('panel').classList.add('hidden'); }
+  $('panelClose').addEventListener('click', closePanel);
+
+  function panelNote(text) {
+    var list = $('panelList');
+    while (list.firstChild) list.removeChild(list.firstChild);
+    var n = document.createElement('div'); n.className = 'note'; n.textContent = text;
+    list.appendChild(n);
+  }
+
+  function panelItems(arr, withUnpin) {
+    var list = $('panelList');
+    while (list.firstChild) list.removeChild(list.firstChild);
+    arr.forEach(function (p) {
+      var it = document.createElement('div'); it.className = 'item';
+      var g = document.createElement('div'); g.className = 'grow';
+      var sm = document.createElement('small'); sm.textContent = (isMe(p.name) ? 'You' : p.name) + ' · ' + timeLabel(p.t);
+      var sp = document.createElement('span'); sp.textContent = p.text;
+      g.appendChild(sm); g.appendChild(sp); it.appendChild(g);
+      it.addEventListener('click', function () { closePanel(); jumpTo(p.id); });
+      if (withUnpin) {
+        var u = document.createElement('button'); u.type = 'button'; u.textContent = 'Unpin';
+        u.addEventListener('click', function (ev) { ev.stopPropagation(); setPin(p.id, false); });
+        it.appendChild(u);
+      }
+      list.appendChild(it);
+    });
+  }
+
+  function showPins() {
+    openPanel('pins', 'Pinned messages');
+    if (!pins.length) { panelNote('Nothing is pinned yet. Tap a message and choose Pin.'); return; }
+    panelItems(pins.slice().reverse(), true);
+  }
+
+  $('searchBtn').addEventListener('click', function () {
+    openPanel('search', 'Search');
+    panelNote('Type a word and tap Search. It looks through the whole chat.');
+    $('searchIn').value = '';
+    $('searchIn').focus();
+  });
+  $('searchForm').addEventListener('submit', function (ev) {
+    ev.preventDefault();
+    var q = $('searchIn').value.trim();
+    if (!q) return;
+    panelNote('Searching…');
+    api('search', { pass: pass, q: q }).then(function (res) {
+      if (panelMode !== 'search') return;
+      var found = (res && res.items) || [];
+      if (!found.length) { panelNote('No messages contain "' + q + '".'); return; }
+      panelItems(found, false);
+    }).catch(function (err) { panelNote('Search did not work: ' + errText(err)); });
+  });
 
   // ---------- Checking for new messages ----------
   function poll() {
@@ -483,13 +808,13 @@
     if (busy) { wantPoll = true; return; }
     if (!document.hidden) seenRow = lastRow;
     busy = true;
-    api('getMessages', { pass: pass, after: lastRow || 1, name: me, seen: seenRow }).then(function (res) {
+    api('getMessages', { pass: pass, after: lastRow || 1, name: me, seen: seenRow, rv: rv, pv: pv }).then(function (res) {
       busy = false; if ($('status').getAttribute('data-net')) setStatus('');
       addMessages(res, false);
       if (wantPoll) { wantPoll = false; poll(); }
     }).catch(function (err) {
       busy = false; wantPoll = false;
-      if (isWrongPass(err)) signOut('The passcode has changed. Please sign in again.');
+      if (isWrongPass(err)) signOut('Please sign in again.');
       else setStatus(navigator.onLine === false ? 'No internet. Waiting to reconnect…' : 'Connection problem. Trying again…', true);
     });
   }
@@ -511,6 +836,16 @@
     if (!document.hidden && pass) { seenRow = lastRow; hotUntil = Date.now() + 30000; poll(); startPolling(); }
   });
   window.addEventListener('online', poll);
+
+  // ---------- Replying ----------
+  function setReply(r) {
+    replyTo = r;
+    if (!r) { $('replybar').classList.add('hidden'); return; }
+    $('replyName').textContent = 'Replying to ' + (isMe(r.name) ? 'yourself' : r.name);
+    $('replyText').textContent = r.text;
+    $('replybar').classList.remove('hidden');
+  }
+  $('replyCancel').addEventListener('click', function () { setReply(null); });
 
   // ---------- Sending ----------
   var msgIn = $('msgIn');
@@ -540,7 +875,7 @@
     if (job.reply) b.appendChild(makeQuote(job.reply));
     if (job.pic) { var im = document.createElement('img'); im.className = 'pic'; im.alt = 'Picture being sent'; im.src = job.pic; b.appendChild(im); }
     if (job.voice) { var v = document.createElement('div'); v.className = 'text'; v.textContent = 'Voice message'; b.appendChild(v); }
-    if (job.text) { var tx = document.createElement('div'); tx.className = 'text'; tx.textContent = job.text; b.appendChild(tx); }
+    if (job.text) { var tx = document.createElement('div'); tx.className = 'text'; fillText(tx, job.text); b.appendChild(tx); }
     var tm = document.createElement('div'); tm.className = 'time'; tm.textContent = 'Sending…';
     b.appendChild(tm); row.appendChild(b);
     var empty = $('empty'); if (empty) empty.remove();
@@ -570,10 +905,10 @@
         var i = pendingEls.indexOf(j.el); if (i !== -1) pendingEls.splice(i, 1);
         if (j.el.parentNode) j.el.parentNode.removeChild(j.el);
       });
-      if (isWrongPass(err)) { signOut('The passcode has changed. Please sign in again.'); return; }
+      if (isWrongPass(err)) { signOut('Please sign in again.'); return; }
       var texts = lost.map(function (j) { return j.text; }).filter(Boolean).join('\n');
       if (texts && !msgIn.value) msgIn.value = texts;
-      setStatus('Not sent: ' + String(err && err.message || err) + '. Please send again.');
+      setStatus('Not sent: ' + errText(err) + '. Please send again.');
     });
   }
 
@@ -591,7 +926,7 @@
   $('micBtn').addEventListener('click', function () {
     if (rec) return;
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia || typeof MediaRecorder === 'undefined') {
-      $('status').textContent = 'This phone or browser cannot record voice messages.';
+      setStatus('This phone or browser cannot record voice messages.');
       return;
     }
     navigator.mediaDevices.getUserMedia({ audio: true }).then(function (stream) {
@@ -604,7 +939,7 @@
       rec.onstop = recDone;
       rec.start();
       recStart = Date.now();
-      $('status').textContent = '';
+      setStatus('');
       $('composer').classList.add('hidden');
       $('recbar').classList.remove('hidden');
       $('recTime').textContent = 'Recording 0:00';
@@ -614,7 +949,7 @@
         if (s >= REC_MAX) recStop(true);
       }, 500);
     }).catch(function () {
-      $('status').textContent = 'Microphone not allowed. Allow the microphone for this app and try again.';
+      setStatus('Microphone not allowed. Allow the microphone for this app and try again.');
     });
   });
   $('recCancel').addEventListener('click', function () { recStop(false); });
@@ -638,7 +973,7 @@
     var fr = new FileReader();
     fr.onload = function () {
       var b64 = String(fr.result).split('base64,')[1] || '';
-      if (!b64) { $('status').textContent = 'The recording was empty. Please try again.'; return; }
+      if (!b64) { setStatus('The recording was empty. Please try again.'); return; }
       enqueue({ text: '', pic: '', voice: 'data:' + type + ';base64,' + b64, reply: replyTo });
       setReply(null);
     };
@@ -672,18 +1007,18 @@
       URL.revokeObjectURL(url);
       $('previewImg').src = pendingPic;
       $('preview').classList.remove('hidden');
-      $('status').textContent = '';
+      setStatus('');
     };
     img.onerror = function () {
       URL.revokeObjectURL(url);
-      $('status').textContent = 'That picture could not be opened. Try another one.';
+      setStatus('That picture could not be opened. Try another one.');
     };
     img.src = url;
   });
 
   // ---------- Start: open straight into the saved chat ----------
   (function () {
-    var n = load('chatName'), p = load('chatPass');
+    var n = known(load('chatName')), p = load('chatPass');
     if (!(n && p)) { showLogin(API ? '' : 'The app link is not set yet. Put your /exec link in config.js.'); return; }
     me = n; pass = p;
     openChat();
@@ -692,6 +1027,8 @@
     try { saved = JSON.parse(load('chatCache') || 'null'); } catch (e) {}
     if (saved && saved.items && saved.items.length) {
       addMessages({ items: saved.items, last: saved.last, status: { delivered: saved.d, seen: saved.s } }, true);
+      // Old saved copies have no reaction marker; 0 makes the server send what was missed or ask for a reload
+      rv = typeof saved.rv === 'number' ? saved.rv : 0;
       startPolling();
       poll();
     } else {
@@ -699,8 +1036,8 @@
         addMessages(res, true);
         startPolling();
       }).catch(function (err) {
-        if (isWrongPass(err)) signOut('The passcode has changed. Please sign in again.');
-        else { setStatus('Connection problem. Trying again…', true); lastRow = 0; startPolling(); }
+        if (isWrongPass(err)) signOut('Please sign in again.');
+        else { setStatus('Connection problem. Trying again…', true); startPolling(); }
       });
     }
   })();
