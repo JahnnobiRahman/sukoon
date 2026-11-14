@@ -750,25 +750,50 @@
   }
 
   function makeFile(f) {
+    var touch = ('ontouchstart' in window) || navigator.maxTouchPoints > 0;
     var note = sizeLabel(f.size) + ' \u00B7 tap to download';
-    var card = fileCard(f.name, note), busyDl = false;
+    var card = fileCard(f.name, note), busyDl = false, ready = null;
     var sm = card.querySelector('small');
+
+    function saveByLink() {
+      var url = URL.createObjectURL(ready);
+      var a = document.createElement('a'); a.href = url; a.download = f.name; a.rel = 'noopener';
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(function () { URL.revokeObjectURL(url); }, 60000);
+    }
+    // On phones, hand the file to the phone's own "open / save" sheet when it can take it
+    function deliver() {
+      var canShare = false;
+      try { canShare = touch && navigator.canShare && navigator.canShare({ files: [ready] }); } catch (e) {}
+      if (!canShare) { saveByLink(); return; }
+      navigator.share({ files: [ready], title: f.name }).catch(function (err) {
+        if (!err || err.name !== 'AbortError') saveByLink();
+      });
+    }
+
     card.addEventListener('click', function () {
       if (selecting || busyDl) return;
+      if (ready) { deliver(); return; }
       busyDl = true; sm.textContent = 'Downloading…';
-      api('getPicture', { pass: pass, id: f.id })
-        .then(function (src) { return fetch(src); })
-        .then(function (r) { return r.blob(); })
-        .then(function (blob) {
-          var url = URL.createObjectURL(blob);
-          var a = document.createElement('a'); a.href = url; a.download = f.name;
-          document.body.appendChild(a); a.click(); a.remove();
-          setTimeout(function () { URL.revokeObjectURL(url); }, 60000);
-          busyDl = false; sm.textContent = note;
-        }).catch(function (err) {
-          busyDl = false; sm.textContent = note;
-          setStatus('Could not download: ' + errText(err));
-        });
+      api('getPicture', { pass: pass, id: f.id }).then(function (src) {
+        // Turn the received text back into the real file
+        var at = src.indexOf('base64,');
+        var type = src.slice(5, src.indexOf(';')) || 'application/octet-stream';
+        var bin = atob(src.slice(at + 7)), bytes = new Uint8Array(bin.length);
+        for (var i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+        ready = new File([bytes], f.name, { type: type });
+        busyDl = false;
+        if (touch) {
+          // Phones only allow saving straight after a tap, so ask for one more
+          sm.textContent = sizeLabel(f.size) + ' \u00B7 ready, tap to open or save';
+        } else {
+          sm.textContent = sizeLabel(f.size) + ' \u00B7 tap to save again';
+          deliver();
+        }
+      }).catch(function (err) {
+        busyDl = false; sm.textContent = note;
+        setStatus('Could not download: ' + errText(err));
+      });
     });
     return card;
   }
