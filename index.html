@@ -43,11 +43,19 @@
   .avatar { flex: none; width: 40px; height: 40px; border-radius: 50%; background: var(--amber); color: var(--navy); font-weight: 700; font-size: 18px; display: flex; align-items: center; justify-content: center; margin-right: 4px; }
   header .grow { flex: 1; min-width: 0; }
   header .title { font-weight: 700; font-size: 17px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  header .who.typing { color: var(--amber); opacity: 1; font-weight: 600; }
   header .who { font-size: 12px; opacity: .8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .hbtn { flex: none; width: 38px; height: 38px; border-radius: 50%; border: 0; background: transparent; cursor: pointer; display: flex; align-items: center; justify-content: center; }
   .hbtn svg { width: 21px; height: 21px; }
   #logoutBtn { flex: none; background: transparent; border: 1px solid rgba(255,255,255,.4); color: #fff; border-radius: 8px; padding: 6px 9px; font-size: 13px; cursor: pointer; }
 
+  #selbar { background: var(--navy-2); color: #fff; padding: calc(10px + env(safe-area-inset-top)) 12px 10px 16px; display: flex; align-items: center; gap: 8px; border-bottom: 3px solid var(--amber); min-height: 63px; }
+  #selbar b { flex: 1; font-size: 16px; }
+  #selbar button { border: 1px solid rgba(255,255,255,.45); background: transparent; color: #fff; border-radius: 8px; padding: 8px 12px; font-size: 14px; cursor: pointer; }
+  #selDelete { background: #c5221f !important; border-color: #c5221f !important; font-weight: 600; }
+  #selDelete:disabled { opacity: .5; }
+  .row.sel { background: rgba(224,160,48,.28); border-radius: 10px; }
+  .selecting .rbtn { visibility: hidden; }
   #pinbar { display: flex; align-items: center; gap: 8px; width: 100%; text-align: left; border: 0; background: #fff; border-bottom: 1px solid var(--line); padding: 8px 14px; font-size: 13px; cursor: pointer; color: var(--ink); }
   #pinbar svg { flex: none; width: 16px; height: 16px; }
   #pinbar span { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -56,7 +64,7 @@
   #list { flex: 1; overflow-y: auto; padding: 12px 10px 4px; -webkit-overflow-scrolling: touch; }
   .day { text-align: center; margin: 14px 0 10px; }
   .day span { background: #d5dbe4; color: #3c4756; font-size: 12px; padding: 4px 10px; border-radius: 999px; }
-  .row { display: flex; margin: 4px 0; }
+  .row { display: flex; margin: 4px 0; touch-action: pan-y; }
   .row.mine { justify-content: flex-end; }
   .bubble { max-width: 78%; min-width: 0; background: var(--theirs); border-radius: 14px 14px 14px 4px; padding: 8px 11px 6px; box-shadow: 0 1px 2px rgba(0,0,0,.08); cursor: pointer; }
   .mine .bubble { background: var(--mine); border-radius: 14px 14px 4px 14px; }
@@ -150,7 +158,12 @@
 </div>
 
 <div id="chat" class="hidden">
-  <header>
+  <div id="selbar" class="hidden">
+    <b id="selCount">1 selected</b>
+    <button id="selCancel" type="button">Cancel</button>
+    <button id="selDelete" type="button">Delete</button>
+  </div>
+  <header id="head">
     <div class="avatar" id="avatar">S</div>
     <div class="grow">
       <div class="title" id="title">Sukoon</div>
@@ -206,6 +219,7 @@
     <button class="act" id="actReply" type="button">Reply</button>
     <button class="act" id="actPin" type="button">Pin</button>
     <button class="act" id="actCopy" type="button">Copy text</button>
+    <button class="act" id="actDelete" type="button">Delete (you can select more)</button>
     <button class="act" id="actClose" type="button">Cancel</button>
   </div>
 </div>
@@ -233,6 +247,9 @@
   var pendingPic = '', picCache = {}, items = [], byId = {};
   var seenRow = 0, otherDelivered = 0, otherSeen = 0, otherName = '';
   var hotUntil = 0, wantPoll = false, queue = [], pendingEls = [];
+  var typedAt = 0, typingSent = false, otherTyping = false;
+  var swipe = null, swipedAt = 0;
+  var selecting = false, selected = {}, delArmed = 0;
   var replyTo = null, loadingOlder = false, rv = null, pv = -1, pins = [], sheetMsg = null;
 
   function $(id) { return document.getElementById(id); }
@@ -337,12 +354,12 @@
   function openChat() {
     $('login').classList.add('hidden');
     $('chat').classList.remove('hidden');
-    $('who').textContent = 'You are ' + me;
+    $('who').textContent = 'You are ' + me; $('who').className = 'who';
   }
 
   function showLogin(msg) {
     stopPolling();
-    closeSheet(); closePanel();
+    closeSheet(); closePanel(); endSelect();
     $('chat').classList.add('hidden');
     $('login').classList.remove('hidden');
     setPick(load('chatName'));
@@ -362,7 +379,7 @@
   function resetList() {
     lastRow = 0; firstRow = 0; lastDay = ''; seenRow = 0; otherDelivered = 0; otherSeen = 0;
     items = []; byId = {}; otherName = ''; queue = []; pendingEls = [];
-    rv = null; pv = -1; pins = [];
+    rv = null; pv = -1; pins = []; otherTyping = false; typingSent = false; typedAt = 0;
     setReply(null); paintPins();
     var list = $('list');
     while (list.firstChild) list.removeChild(list.firstChild);
@@ -459,6 +476,8 @@
     paintReacts(rc, m);
     // Tapping the bubble opens the menu (reactions, reply, pin, copy)
     b.addEventListener('click', function (ev) {
+      if (Date.now() - swipedAt < 400) return;
+      if (selecting) { ev.preventDefault(); toggleSel(m.id); return; }
       if (ev.target.closest('a, img, audio, .quote, .chip, button')) return;
       openSheet(m);
     });
@@ -499,15 +518,28 @@
       changed = nd !== otherDelivered || ns !== otherSeen;
       otherDelivered = nd; otherSeen = ns;
     }
-    if (res.rx && res.rx.length) { res.rx.forEach(function (e) { applyRx(e.id, e.r); }); changed = true; }
+    if (res.rx && res.rx.length) {
+      res.rx.forEach(function (e) { if (e.del) e.del.forEach(removeMsg); else applyRx(e.id, e.r); });
+      changed = true;
+    }
     if (typeof res.rv === 'number' && res.rv !== rv) { rv = res.rv; changed = true; }
     if (res.pins) { pins = res.pins; pv = res.pv; paintPins(); }
+    if (typeof res.typing === 'boolean') setOtherTyping(res.typing && !(res.items || []).some(function (m) { return !isMe(m.name); }));
     paintStatus();
     setTitle();
     showOlderButton();
     if (added || changed) { saveCache(); }
     if (added) hotUntil = Date.now() + 30000;
     if (added && (forceScroll || nearBottom || mineAdded)) scrollDown();
+  }
+
+  // Shows "typing…" under the other person's name
+  function setOtherTyping(on) {
+    if (on === otherTyping) return;
+    otherTyping = on;
+    $('who').textContent = on ? 'typing…' : 'You are ' + me;
+    $('who').className = 'who' + (on ? ' typing' : '');
+    if (on) hotUntil = Date.now() + 15000;
   }
 
   function fullReload() {
@@ -550,7 +582,14 @@
     return api('getOlder', { pass: pass, before: firstRow, count: count || 300 }).then(function (res) {
       loadingOlder = false;
       var older = (res && res.items) || [];
-      if (!older.length) { firstRow = 2; showOlderButton(); return false; }
+      if (!older.length) {
+        // That stretch was all deleted messages: keep going from where the server stopped
+        var more = res && res.start > 2 && res.start < firstRow;
+        firstRow = more ? res.start : 2;
+        var ob = $('older'); if (ob) ob.textContent = 'Load earlier messages';
+        showOlderButton();
+        return more;
+      }
       var list = $('list');
       var frag = document.createDocumentFragment(), prevDay = '';
       older.forEach(function (m) {
@@ -569,7 +608,7 @@
       list.insertBefore(frag, after);
       list.scrollTop += list.scrollHeight - before;
       items = older.concat(items);
-      firstRow = older[0].id;
+      firstRow = res.start || older[0].id;
       if (b) b.textContent = 'Load earlier messages';
       paintStatus(); paintPins(); setTitle(); showOlderButton();
       return true;
@@ -715,6 +754,86 @@
     if (m) setPin(m.id, !isPinned(m.id));
   });
 
+  // ---------- Selecting and deleting messages ----------
+  $('actDelete').addEventListener('click', function () {
+    var m = sheetMsg; closeSheet();
+    if (!m) return;
+    selecting = true; selected = {};
+    $('chat').classList.add('selecting');
+    $('head').classList.add('hidden'); $('selbar').classList.remove('hidden');
+    toggleSel(m.id);
+  });
+
+  function toggleSel(id) {
+    var row = rowOf(id);
+    if (!row) return;
+    if (selected[id]) { delete selected[id]; row.classList.remove('sel'); }
+    else { selected[id] = true; row.classList.add('sel'); }
+    paintSel();
+  }
+
+  function paintSel() {
+    var n = Object.keys(selected).length;
+    delArmed = 0;
+    $('selCount').textContent = n + ' selected';
+    $('selDelete').textContent = 'Delete';
+    $('selDelete').disabled = !n;
+  }
+
+  function endSelect() {
+    selecting = false; selected = {}; delArmed = 0;
+    var rows = document.querySelectorAll('.row.sel');
+    for (var i = 0; i < rows.length; i++) rows[i].classList.remove('sel');
+    $('chat').classList.remove('selecting');
+    $('selbar').classList.add('hidden'); $('head').classList.remove('hidden');
+  }
+  $('selCancel').addEventListener('click', endSelect);
+
+  // First tap asks to confirm, second tap deletes for both people
+  $('selDelete').addEventListener('click', function () {
+    var ids = Object.keys(selected).map(Number);
+    if (!ids.length) return;
+    if (Date.now() > delArmed) {
+      delArmed = Date.now() + 4000;
+      $('selDelete').textContent = 'Tap again to delete ' + ids.length;
+      setTimeout(function () { if (selecting && Date.now() >= delArmed) $('selDelete').textContent = 'Delete'; }, 4100);
+      return;
+    }
+    $('selDelete').disabled = true; $('selDelete').textContent = 'Deleting…';
+    api('del', { pass: pass, name: me, ids: ids }).then(function (res) {
+      ((res && res.del) || []).forEach(removeMsg);
+      endSelect(); saveCache(); setStatus('');
+    }).catch(function (err) {
+      endSelect();
+      if (isWrongPass(err)) signOut('Please sign in again.');
+      else setStatus('Could not delete: ' + errText(err));
+    });
+  });
+
+  function removeMsg(id) {
+    id = Number(id);
+    var row = rowOf(id);
+    delete byId[id];
+    items = items.filter(function (m) { return m.id !== id; });
+    var had = pins.length;
+    pins = pins.filter(function (p) { return p.id !== id; });
+    if (pins.length !== had) paintPins();
+    if (!row) return;
+    row.remove();
+    // Remove date headings that no longer have any message under them
+    var days = document.querySelectorAll('#list .day');
+    for (var i = 0; i < days.length; i++) {
+      var nx = days[i].nextElementSibling;
+      if (!nx || nx.classList.contains('day')) days[i].remove();
+    }
+    days = document.querySelectorAll('#list .day');
+    lastDay = days.length ? days[days.length - 1].getAttribute('data-day') : '';
+    if (!document.querySelector('#list .row') && !$('empty')) {
+      var empty = document.createElement('div'); empty.id = 'empty'; empty.textContent = 'No messages here.';
+      $('list').appendChild(empty);
+    }
+  }
+
   // ---------- Pinned messages ----------
   function setPin(id, on) {
     api('pin', { pass: pass, id: id, on: on }).then(function (res) {
@@ -808,7 +927,11 @@
     if (busy) { wantPoll = true; return; }
     if (!document.hidden) seenRow = lastRow;
     busy = true;
-    api('getMessages', { pass: pass, after: lastRow || 1, name: me, seen: seenRow, rv: rv, pv: pv }).then(function (res) {
+    // Tell the other person while I am typing, and once more when I stop
+    var typingNow = !document.hidden && !!msgIn.value && Date.now() - typedAt < 4000, tflag;
+    if (typingNow) { tflag = 1; typingSent = true; }
+    else if (typingSent) { tflag = 0; typingSent = false; }
+    api('getMessages', { pass: pass, after: lastRow || 1, name: me, seen: seenRow, rv: rv, pv: pv, typing: tflag }).then(function (res) {
       busy = false; if ($('status').getAttribute('data-net')) setStatus('');
       addMessages(res, false);
       if (wantPoll) { wantPoll = false; poll(); }
@@ -847,11 +970,55 @@
   }
   $('replyCancel').addEventListener('click', function () { setReply(null); });
 
+  // Swipe a message to the right to reply to it
+  (function () {
+    var list = $('list');
+    list.addEventListener('touchstart', function (ev) {
+      swipe = null;
+      if (selecting || ev.touches.length !== 1 || ev.target.closest('audio')) return;
+      var row = ev.target.closest('.row');
+      if (!row || !row.getAttribute('data-row')) return;
+      swipe = { row: row, b: row.querySelector('.bubble'), x: ev.touches[0].clientX, y: ev.touches[0].clientY, dx: 0, on: false };
+    }, { passive: true });
+    list.addEventListener('touchmove', function (ev) {
+      if (!swipe) return;
+      var dx = ev.touches[0].clientX - swipe.x, dy = ev.touches[0].clientY - swipe.y;
+      if (!swipe.on) {
+        if (Math.abs(dy) > 12 && Math.abs(dy) > Math.abs(dx)) { swipe = null; return; } // scrolling, not swiping
+        if (dx > 12 && Math.abs(dx) > Math.abs(dy) * 1.5) swipe.on = true; else return;
+      }
+      swipe.dx = Math.max(0, Math.min(dx, 90));
+      swipe.b.style.transition = 'none';
+      swipe.b.style.transform = 'translateX(' + swipe.dx + 'px)';
+    }, { passive: true });
+    function end() {
+      if (!swipe) return;
+      var sw = swipe; swipe = null;
+      if (!sw.on) return;
+      swipedAt = Date.now();
+      sw.b.style.transition = 'transform .18s';
+      sw.b.style.transform = '';
+      if (sw.dx >= 56) {
+        var m = byId[Number(sw.row.getAttribute('data-row'))];
+        if (m) {
+          setReply({ id: m.id, name: m.name, text: snippet(m) });
+          if (navigator.vibrate) { try { navigator.vibrate(10); } catch (e) {} }
+          msgIn.focus();
+        }
+      }
+    }
+    list.addEventListener('touchend', end);
+    list.addEventListener('touchcancel', end);
+  })();
+
   // ---------- Sending ----------
   var msgIn = $('msgIn');
   msgIn.addEventListener('input', function () {
     msgIn.style.height = 'auto';
     msgIn.style.height = Math.min(msgIn.scrollHeight, 120) + 'px';
+    typedAt = Date.now();
+    hotUntil = Math.max(hotUntil, Date.now() + 8000);
+    if (!typingSent) poll(); // let the other person know straight away
   });
   msgIn.addEventListener('keydown', function (ev) {
     // On a computer, Enter sends and Shift+Enter makes a new line
@@ -863,6 +1030,7 @@
   function send() {
     var text = msgIn.value.trim();
     if (!text && !pendingPic) return;
+    typedAt = 0;
     enqueue({ text: text, pic: pendingPic, voice: '', reply: replyTo });
     setReply(null);
     msgIn.value = ''; msgIn.style.height = 'auto';
