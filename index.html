@@ -117,7 +117,7 @@
   #composer { display: flex; align-items: flex-end; gap: 5px; padding: 8px 8px calc(10px + env(safe-area-inset-bottom)); }
   #composer textarea { flex: 1; min-width: 0; resize: none; border: 1px solid var(--line); border-radius: 22px; padding: 11px 14px; max-height: 120px; line-height: 1.3; background: #fff; }
   .round { flex: none; width: 44px; height: 44px; border-radius: 50%; border: 0; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-  #picBtn, #micBtn, #docBtn { background: #fff; border: 1px solid var(--line); }
+  #micBtn, #stkBtn, #attBtn { background: #fff; border: 1px solid var(--line); }
   .round { width: 42px; height: 42px; }
   .round svg { width: 21px; height: 21px; }
   #sendBtn { background: var(--navy); }
@@ -134,7 +134,7 @@
   #viewer { position: fixed; inset: 0; background: rgba(0,0,0,.92); display: flex; align-items: center; justify-content: center; z-index: 30; cursor: zoom-out; }
   #viewer img { max-width: 100%; max-height: 100%; }
   .shade { position: fixed; inset: 0; background: rgba(15,23,36,.45); z-index: 20; display: flex; align-items: flex-end; justify-content: center; }
-  #sheet .box { width: 100%; max-width: 760px; background: #fff; border-radius: 18px 18px 0 0; padding: 14px 14px calc(14px + env(safe-area-inset-bottom)); }
+  #sheet .box, #attach .box, #stk .box { width: 100%; max-width: 760px; background: #fff; border-radius: 18px 18px 0 0; padding: 14px 14px calc(14px + env(safe-area-inset-bottom)); }
   #emojis { display: flex; justify-content: space-between; margin-bottom: 10px; }
   #emojis button { border: 0; background: #f1f3f6; border-radius: 50%; width: 46px; height: 46px; font-size: 24px; cursor: pointer; }
   #emojis button.on { background: #fdf3df; box-shadow: inset 0 0 0 2px var(--amber); }
@@ -154,6 +154,39 @@
   .item span { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; overflow-wrap: anywhere; }
   .item button { flex: none; border: 0; background: #edf0f4; border-radius: 8px; padding: 6px 10px; font-size: 13px; cursor: pointer; }
   .note { text-align: center; color: var(--muted); font-size: 14px; margin-top: 30px; padding: 0 20px; }
+  /* Stickers */
+  .row.stk .bubble { background: transparent; box-shadow: none; padding: 2px 4px; }
+  .stkimg { display: block; width: 140px; height: 140px; object-fit: contain; cursor: pointer; }
+  .text.big { font-size: 44px; line-height: 1.15; }
+  #attach .act:first-child { border-top: 0; }
+  #stk .box { max-height: 72vh; overflow-y: auto; }
+  #stkTop { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+  #stkTop span { flex: 1; }
+  #stkTop .tab { background: transparent !important; color: var(--muted) !important; font-size: 15px; font-weight: 700; padding: 7px 8px; border-bottom: 2px solid transparent; border-radius: 0; }
+  #stkTop .tab.on { color: var(--ink) !important; border-bottom-color: var(--amber); }
+  #stkTop button { border: 0; border-radius: 8px; padding: 7px 12px; font-size: 13px; cursor: pointer; }
+  #stkEdit.on { background: #c5221f !important; color: #fff !important; }
+  #stkGrid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+  #stkGrid button { position: relative; aspect-ratio: 1; border: 0; border-radius: 12px; padding: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 12px; overflow: hidden; }
+  #stkGrid img { width: 100%; height: 100%; object-fit: contain; }
+  #stkGrid .add { font-size: 30px; border: 1px dashed var(--line); background: transparent; color: var(--muted); }
+  #stkGrid.editing button:not(.add)::after { content: '\00D7'; position: absolute; top: 2px; right: 2px; width: 20px; height: 20px; line-height: 20px; border-radius: 50%; background: #c5221f; color: #fff; font-size: 15px; }
+  #stkNote { grid-column: 1 / -1; color: var(--muted); font-size: 13px; padding: 4px 2px; }
+  #stkHead { margin: 14px 0 8px; font-size: 13px; color: var(--muted); font-weight: 600; }
+  #emoGrid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 4px; }
+  #emoGrid button { border: 0; background: none; font-size: 30px; padding: 6px 0; cursor: pointer; border-radius: 10px; }
+
+  /* GIF search */
+  #gifForm { display: flex; gap: 8px; margin-bottom: 10px; }
+  #gifForm input { flex: 1; min-width: 0; padding: 10px 14px; border: 1px solid var(--line); border-radius: 22px; }
+  #gifForm button { border: 0; border-radius: 22px; padding: 0 16px; font-weight: 600; cursor: pointer; }
+  #gifGrid { column-count: 2; column-gap: 8px; min-height: 120px; }
+  #gifGrid button { display: block; width: 100%; margin: 0 0 8px; padding: 0; border: 0; border-radius: 10px; overflow: hidden; cursor: pointer; background: var(--soft); break-inside: avoid; }
+  #gifGrid img { display: block; width: 100%; height: auto; }
+  #gifGrid .note { margin: 20px 0; column-span: all; }
+  #gifCredit { text-align: center; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); padding: 6px 0 2px; }
+  .gifimg { width: 200px; max-height: none; }
+
   /* ---------- Dark mode ---------- */
   :root {
     color-scheme: dark;
@@ -161,11 +194,11 @@
     --bg: #0e141c; --mine: #1d4a7c; --theirs: #1c2735; --ink: #e7ecf3; --muted: #93a0b4; --line: #2e3b4e;
     --surface: #18222f; --soft: #243245; --soft-ink: #c3cddc;
   }
-  .card, #pinbar, #replybar, #sheet .box, .item, .chip, #who2 button, #picBtn, #micBtn, #docBtn, #docbar,
-  #composer textarea, .card input, #searchForm input { background: var(--surface); color: var(--ink); }
+  .card, #pinbar, #replybar, #sheet .box, #attach .box, #stk .box, .item, .chip, #who2 button, #micBtn, #stkBtn, #attBtn, #docbar,
+  #composer textarea, .card input, #searchForm input, #gifForm input { background: var(--surface); color: var(--ink); }
   .card { box-shadow: 0 6px 24px rgba(0,0,0,.45); }
   .card h1 { color: var(--ink); }
-  .day span, #older, #preview button, #recCancel, .item button, #emojis button { background: var(--soft); color: var(--soft-ink); }
+  .day span, #older, #preview button, #recCancel, .item button, #emojis button, #stkTop button, #stkGrid button { background: var(--soft); color: var(--soft-ink); }
   .quote { background: rgba(255,255,255,.09); }
   .quote span, #replybar span { color: var(--soft-ink); }
   .picwait { background: rgba(255,255,255,.07); }
@@ -175,7 +208,7 @@
   .act { border-top-color: #263244; }
   #loginErr, #status { color: #ff8a80; }
   #status.info { color: var(--soft-ink); }
-  #sendBtn, .primary, #recSend, #searchForm button, #who2 button.on { background: var(--amber); border-color: var(--amber); color: #14202f; }
+  #sendBtn, .primary, #recSend, #searchForm button, #gifForm button, #who2 button.on { background: var(--amber); border-color: var(--amber); color: #14202f; }
   #selbar { background: #22395c; }
   .shade { background: rgba(0,0,0,.6); }
   .bubble { box-shadow: 0 1px 2px rgba(0,0,0,.35); }
@@ -236,16 +269,16 @@
     <button id="removeDoc" type="button">Remove</button>
   </div>
   <div id="composer">
-    <button class="round" id="picBtn" type="button" aria-label="Add a picture">
-      <svg viewBox="0 0 24 24" fill="none" stroke="#c3cddc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="8.5" cy="10" r="1.5"/><path d="M21 15l-5-5L5 19"/></svg>
+    <button class="round" id="stkBtn" type="button" aria-label="Stickers and emoji">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#c3cddc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8.5 14.5a4.5 4.5 0 0 0 7 0"/><path d="M9 9.5v.5M15 9.5v.5"/></svg>
     </button>
-    <button class="round" id="docBtn" type="button" aria-label="Send a document">
+    <textarea id="msgIn" rows="1" placeholder="Message" maxlength="4000"></textarea>
+    <button class="round" id="attBtn" type="button" aria-label="Attach a picture or document">
       <svg viewBox="0 0 24 24" fill="none" stroke="#c3cddc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11.5l-8.2 8.2a5 5 0 0 1-7.1-7.1l8.6-8.6a3.4 3.4 0 0 1 4.8 4.8l-8.5 8.5a1.8 1.8 0 0 1-2.5-2.5l7.8-7.8"/></svg>
     </button>
     <button class="round" id="micBtn" type="button" aria-label="Record a voice message">
       <svg viewBox="0 0 24 24" fill="none" stroke="#c3cddc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>
     </button>
-    <textarea id="msgIn" rows="1" placeholder="Message" maxlength="4000"></textarea>
     <button class="round" id="sendBtn" type="button" aria-label="Send">
       <svg viewBox="0 0 24 24" fill="#14202f"><path d="M3 20l18-8L3 4v6l12 2-12 2z"/></svg>
     </button>
@@ -267,10 +300,43 @@
     <button class="act" id="actReply" type="button">Reply</button>
     <button class="act" id="actPin" type="button">Pin</button>
     <button class="act" id="actCopy" type="button">Copy text</button>
+    <button class="act" id="actSticker" type="button">Add to stickers</button>
     <button class="act" id="actDelete" type="button">Delete (you can select more)</button>
     <button class="act" id="actClose" type="button">Cancel</button>
   </div>
 </div>
+
+<!-- Attach: picture or document -->
+<div id="attach" class="shade hidden">
+  <div class="box">
+    <button class="act" id="picBtn" type="button">Picture or GIF</button>
+    <button class="act" id="docBtn" type="button">Document</button>
+    <button class="act" id="attClose" type="button">Cancel</button>
+  </div>
+</div>
+
+<!-- Stickers and big emoji -->
+<div id="stk" class="shade hidden">
+  <div class="box">
+    <div id="stkTop">
+      <button id="tabStk" class="tab on" type="button">Stickers</button>
+      <button id="tabGif" class="tab" type="button">GIFs</button>
+      <span></span>
+      <button id="stkEdit" type="button">Remove</button><button id="stkClose" type="button">Close</button>
+    </div>
+    <div id="stkPage">
+      <div id="stkGrid"></div>
+      <div id="stkHead">Emoji</div>
+      <div id="emoGrid"></div>
+    </div>
+    <div id="gifPage" class="hidden">
+      <form id="gifForm"><input id="gifIn" type="search" placeholder="Search GIPHY" autocomplete="off"><button type="submit">Search</button></form>
+      <div id="gifGrid"></div>
+      <div id="gifCredit">Powered by GIPHY</div>
+    </div>
+  </div>
+</div>
+<input id="stkIn" type="file" accept="image/*" class="hidden">
 
 <!-- Search and pinned messages -->
 <div id="panel" class="shade hidden">
@@ -295,6 +361,10 @@
   var pendingPic = '', picCache = {}, items = [], byId = {};
   var seenRow = 0, otherDelivered = 0, otherSeen = 0, otherName = '';
   var hotUntil = 0, wantPoll = false, queue = [], pendingEls = [];
+  var stickers = null, stkEditing = false;
+  // Key for the GIPHY GIF search (can also be set as window.GIPHY_KEY in config.js)
+  var GIPHY_KEY = window.GIPHY_KEY || 'o9sMkdws363zYPGxDocg7RB3TNJJbMff', gifSeq = 0, gifLoaded = false;
+  var BIG_EMOJI = ['\uD83D\uDE00','\uD83D\uDE02','\uD83E\uDD23','\uD83D\uDE0A','\uD83D\uDE0D','\uD83E\uDD70','\uD83D\uDE18','\uD83D\uDE0E','\uD83E\uDD14','\uD83D\uDE34','\uD83D\uDE2D','\uD83D\uDE21','\uD83D\uDE31','\uD83E\uDD73','\uD83D\uDE07','\uD83D\uDE48','\uD83D\uDC4D','\uD83D\uDC4E','\uD83D\uDC4F','\uD83D\uDE4F','\uD83D\uDCAA','\uD83E\uDD1D','\uD83D\uDC4B','\uD83E\uDD32','\u2764\uFE0F','\uD83D\uDC94','\uD83D\uDD25','\u2B50','\uD83C\uDF89','\uD83C\uDF39','\u2615','\uD83C\uDF19','\u2705','\u274C','\uD83D\uDCAF','\uD83C\uDF81'];
   var pendingFile = null, MAX_FILE = 10 * 1024 * 1024;
   var notifyOn = false, unread = 0, audioCtx = null;
   var typedAt = 0, typingSent = false, otherTyping = false;
@@ -409,7 +479,7 @@
 
   function showLogin(msg) {
     stopPolling();
-    closeSheet(); closePanel(); endSelect();
+    closeSheet(); closePanel(); endSelect(); closeStk(); closeAttach();
     $('chat').classList.add('hidden');
     $('login').classList.remove('hidden');
     setPick(load('chatName'));
@@ -461,7 +531,7 @@
   }
 
   function snippet(m) {
-    return m.text ? String(m.text).slice(0, 140) : m.pic ? 'Picture' : m.voice ? 'Voice message' : m.file ? 'Document: ' + m.file.name : '';
+    return m.text ? String(m.text).slice(0, 140) : m.stk ? 'Sticker' : m.gif ? 'GIF' : m.pic ? 'Picture' : m.voice ? 'Voice message' : m.file ? 'Document: ' + m.file.name : '';
   }
 
   // Turns web addresses inside a message into links that open in the browser
@@ -519,10 +589,12 @@
       return row;
     }
     if (m.reply && m.reply.id) b.appendChild(makeQuote(m.reply));
-    if (m.pic) b.appendChild(makePic(m.pic));
+    if (m.pic && m.stk) { row.className += ' stk'; b.appendChild(makeSticker(m)); }
+    else if (m.pic) b.appendChild(makePic(m.pic));
+    if (m.gif) b.appendChild(makeGif(m.gif));
     if (m.voice) b.appendChild(makeVoice(m.voice));
     if (m.file) b.appendChild(makeFile(m.file));
-    if (m.text) { var tx = document.createElement('div'); tx.className = 'text'; fillText(tx, m.text); b.appendChild(tx); }
+    if (m.text) { var tx = document.createElement('div'); tx.className = 'text' + (isBigEmoji(m.text) ? ' big' : ''); fillText(tx, m.text); b.appendChild(tx); }
     var tm = document.createElement('div'); tm.className = 'time';
     var pm = document.createElement('span'); pm.className = 'pinmark'; tm.appendChild(pm);
     tm.appendChild(document.createTextNode(d.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })));
@@ -539,7 +611,7 @@
     b.addEventListener('click', function (ev) {
       if (Date.now() - swipedAt < 400) return;
       if (selecting) { ev.preventDefault(); toggleSel(m.id); return; }
-      if (ev.target.closest('a, img, audio, .quote, .chip, .file, button')) return;
+      if (ev.target.closest('a, img.pic, audio, .quote, .chip, .file, button')) return;
       openSheet(m);
     });
     var rb = document.createElement('button'); rb.type = 'button'; rb.className = 'rbtn';
@@ -722,6 +794,30 @@
     return wait;
   }
 
+  // A message of one to three emoji and nothing else is shown large
+  var bigRe = null;
+  try { bigRe = new RegExp('^(?:\\p{Extended_Pictographic}(?:\\uFE0F|\\u200D\\p{Extended_Pictographic}|[\\u{1F3FB}-\\u{1F3FF}])*\\s*){1,3}$', 'u'); } catch (e) {}
+  function isBigEmoji(t) { return !!bigRe && bigRe.test(String(t).trim()); }
+
+  // A GIF from the GIPHY search plays straight from GIPHY's servers
+  function makeGif(url) {
+    var img = document.createElement('img'); img.className = 'pic gifimg'; img.alt = 'GIF'; img.loading = 'lazy'; img.src = url;
+    var list = $('list');
+    var nearBottom = list.scrollHeight - list.scrollTop - list.clientHeight < 200;
+    img.addEventListener('load', function () { if (nearBottom) scrollDown(); });
+    img.addEventListener('click', function () { if (selecting) return; $('viewerImg').src = url; $('viewer').classList.remove('hidden'); });
+    return img;
+  }
+
+  function makeSticker(m) {
+    var wait = document.createElement('div'); wait.className = 'picwait'; wait.style.width = wait.style.height = '140px'; wait.textContent = 'Sticker…';
+    fetchMedia(m.pic).then(function (src) {
+      var img = document.createElement('img'); img.className = 'stkimg'; img.alt = 'Sticker'; img.src = src;
+      if (wait.parentNode) wait.parentNode.replaceChild(img, wait);
+    }).catch(function () { wait.textContent = 'Sticker could not load'; });
+    return wait;
+  }
+
   function makeVoice(id) {
     var wait = document.createElement('div'); wait.className = 'text'; wait.textContent = 'Loading voice message…';
     fetchMedia(id).then(function (src) {
@@ -866,6 +962,7 @@
     for (var i = 0; i < bs.length; i++) bs[i].className = bs[i].getAttribute('data-emoji') === mineEmoji ? 'on' : '';
     $('actPin').textContent = isPinned(m.id) ? 'Unpin' : 'Pin';
     $('actCopy').classList.toggle('hidden', !m.text);
+    $('actSticker').classList.toggle('hidden', !m.pic || !!m.stk);
     $('sheet').classList.remove('hidden');
   }
   function closeSheet() { sheetMsg = null; $('sheet').classList.add('hidden'); }
@@ -883,6 +980,183 @@
     var m = sheetMsg; closeSheet();
     if (m) setPin(m.id, !isPinned(m.id));
   });
+
+  // ---------- Stickers ----------
+  $('actSticker').addEventListener('click', function () {
+    var m = sheetMsg; closeSheet();
+    if (!m || !m.pic) return;
+    setInfo('Adding to stickers…');
+    api('sticker', { pass: pass, op: 'fromPic', arg: m.pic }).then(function (res) {
+      stickers = res.list; setInfo('Added to stickers.');
+    }).catch(function (err) { setStatus('Could not add the sticker: ' + errText(err)); });
+  });
+
+  function closeStk() { $('stk').classList.add('hidden'); stkEditing = false; }
+
+  // ---------- GIF search (GIPHY) ----------
+  function showTab(gif) {
+    $('tabStk').className = 'tab' + (gif ? '' : ' on');
+    $('tabGif').className = 'tab' + (gif ? ' on' : '');
+    $('stkPage').classList.toggle('hidden', gif);
+    $('gifPage').classList.toggle('hidden', !gif);
+    if (gif) { $('stkEdit').classList.add('hidden'); if (!gifLoaded) loadGifs(''); }
+    else renderStk();
+  }
+  $('tabStk').addEventListener('click', function () { showTab(false); });
+  $('tabGif').addEventListener('click', function () { showTab(true); });
+
+  function gifNote(text) {
+    var grid = $('gifGrid');
+    while (grid.firstChild) grid.removeChild(grid.firstChild);
+    var n = document.createElement('div'); n.className = 'note'; n.textContent = text;
+    grid.appendChild(n);
+  }
+
+  // Empty search shows what is trending
+  function loadGifs(q) {
+    var seq = ++gifSeq;
+    gifNote('Loading GIFs…');
+    var url = 'https://api.giphy.com/v1/gifs/' + (q ? 'search' : 'trending') + '?api_key=' + encodeURIComponent(GIPHY_KEY) +
+      '&limit=24&rating=pg-13' + (q ? '&q=' + encodeURIComponent(q) : '');
+    fetch(url).then(function (r) {
+      if (r.status === 401 || r.status === 403) throw new Error('GIPHY did not accept the key.');
+      if (r.status === 429) throw new Error('The free GIPHY limit is used up for now. Try again later.');
+      if (!r.ok) throw new Error('GIPHY answered with error ' + r.status + '.');
+      return r.json();
+    }).then(function (j) {
+      if (seq !== gifSeq) return; // a newer search has started
+      gifLoaded = true;
+      var data = (j && j.data) || [];
+      if (!data.length) { gifNote(q ? 'No GIFs found for "' + q + '".' : 'No GIFs to show right now.'); return; }
+      var grid = $('gifGrid');
+      while (grid.firstChild) grid.removeChild(grid.firstChild);
+      data.forEach(function (g) {
+        var im = g.images || {};
+        var small = im.fixed_width_small || im.fixed_width || im.original;
+        var send = im.fixed_width || im.downsized || im.original;
+        if (!small || !small.url || !send || !send.url) return;
+        var b = document.createElement('button'); b.type = 'button';
+        b.setAttribute('aria-label', 'Send GIF' + (g.title ? ': ' + g.title : ''));
+        var img = document.createElement('img'); img.alt = ''; img.loading = 'lazy'; img.src = small.url;
+        if (small.width && small.height) { img.width = small.width; img.height = small.height; }
+        b.appendChild(img);
+        b.addEventListener('click', function () {
+          closeStk();
+          enqueue({ text: '', pic: '', voice: '', reply: replyTo, gif: send.url });
+          setReply(null);
+        });
+        grid.appendChild(b);
+      });
+    }).catch(function (err) {
+      if (seq !== gifSeq) return;
+      gifNote('GIFs could not load. ' + errText(err));
+    });
+  }
+
+  var gifTimer = null;
+  $('gifForm').addEventListener('submit', function (ev) { ev.preventDefault(); clearTimeout(gifTimer); loadGifs($('gifIn').value.trim()); });
+  $('gifIn').addEventListener('input', function () {
+    clearTimeout(gifTimer);
+    gifTimer = setTimeout(function () { loadGifs($('gifIn').value.trim()); }, 500);
+  });
+  $('stkClose').addEventListener('click', closeStk);
+  $('stk').addEventListener('click', function (ev) { if (ev.target === $('stk')) closeStk(); });
+  $('stkEdit').addEventListener('click', function () { stkEditing = !stkEditing; renderStk(); });
+
+  $('stkBtn').addEventListener('click', function () {
+    stkEditing = false;
+    $('stk').classList.remove('hidden');
+    showTab(false);
+    api('sticker', { pass: pass, op: 'list' }).then(function (res) { stickers = res.list; renderStk(); })
+      .catch(function (err) { if (isWrongPass(err)) signOut('Please sign in again.'); });
+  });
+
+  function renderStk() {
+    var grid = $('stkGrid');
+    while (grid.firstChild) grid.removeChild(grid.firstChild);
+    grid.className = stkEditing ? 'editing' : '';
+    $('stkEdit').className = stkEditing ? 'on' : '';
+    $('stkEdit').textContent = stkEditing ? 'Done' : 'Remove';
+    $('stkEdit').classList.toggle('hidden', !(stickers && stickers.length));
+    var add = document.createElement('button'); add.type = 'button'; add.className = 'add'; add.textContent = '+';
+    add.setAttribute('aria-label', 'Add a sticker from your pictures');
+    add.addEventListener('click', function () { $('stkIn').click(); });
+    grid.appendChild(add);
+    if (!stickers || !stickers.length) {
+      var n = document.createElement('div'); n.id = 'stkNote';
+      n.textContent = stickers ? 'No stickers yet. Tap + to add a picture or GIF, or tap a picture in the chat and choose "Add to stickers".' : 'Loading stickers…';
+      grid.appendChild(n);
+      return;
+    }
+    stickers.slice().reverse().forEach(function (id) {
+      var b = document.createElement('button'); b.type = 'button'; b.textContent = '…';
+      b.setAttribute('aria-label', stkEditing ? 'Remove this sticker' : 'Send this sticker');
+      fetchMedia(id).then(function (src) {
+        b.textContent = '';
+        var img = document.createElement('img'); img.alt = ''; img.src = src; b.appendChild(img);
+      }).catch(function () { b.textContent = '?'; });
+      b.addEventListener('click', function () {
+        if (stkEditing) {
+          api('sticker', { pass: pass, op: 'remove', arg: id }).then(function (res) { stickers = res.list; if (!stickers.length) stkEditing = false; renderStk(); })
+            .catch(function (err) { setStatus('Could not remove the sticker: ' + errText(err)); });
+          return;
+        }
+        closeStk();
+        enqueue({ text: '', pic: '', voice: '', reply: replyTo, sticker: id });
+        setReply(null);
+      });
+      grid.appendChild(b);
+    });
+  }
+
+  BIG_EMOJI.forEach(function (e) {
+    var b = document.createElement('button'); b.type = 'button'; b.textContent = e;
+    b.addEventListener('click', function () {
+      closeStk();
+      enqueue({ text: e, pic: '', voice: '', reply: replyTo });
+      setReply(null);
+    });
+    $('emoGrid').appendChild(b);
+  });
+
+  // Adding a new sticker: small pictures keep see-through backgrounds, GIFs stay animated
+  $('stkIn').addEventListener('change', function () {
+    var f = this.files && this.files[0];
+    this.value = '';
+    if (!f) return;
+    function upload(data) {
+      setInfo('Adding sticker…');
+      api('sticker', { pass: pass, op: 'upload', arg: data }).then(function (res) {
+        stickers = res.list; renderStk(); setInfo('Sticker added.');
+      }).catch(function (err) { setStatus('Could not add the sticker: ' + errText(err)); });
+    }
+    if (f.type === 'image/gif') {
+      if (f.size > 2 * 1024 * 1024) { setStatus('That GIF is too big for a sticker. The limit is 2 MB.'); return; }
+      var fr = new FileReader();
+      fr.onload = function () { upload(String(fr.result)); };
+      fr.readAsDataURL(f);
+      return;
+    }
+    var url = URL.createObjectURL(f), img = new Image();
+    img.onload = function () {
+      var max = 320, scale = Math.min(1, max / Math.max(img.naturalWidth, img.naturalHeight));
+      var c = document.createElement('canvas');
+      c.width = Math.max(1, Math.round(img.naturalWidth * scale)); c.height = Math.max(1, Math.round(img.naturalHeight * scale));
+      c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+      URL.revokeObjectURL(url);
+      upload(c.toDataURL('image/png'));
+    };
+    img.onerror = function () { URL.revokeObjectURL(url); setStatus('That picture could not be opened. Try another one.'); };
+    img.src = url;
+  });
+
+  // ---------- Attach menu (picture or document) ----------
+  function closeAttach() { $('attach').classList.add('hidden'); }
+  $('attBtn').addEventListener('click', function () { $('attach').classList.remove('hidden'); });
+  $('attClose').addEventListener('click', closeAttach);
+  $('attach').addEventListener('click', function (ev) { if (ev.target === $('attach')) closeAttach(); });
+  $('picBtn').addEventListener('click', closeAttach);
+  $('docBtn').addEventListener('click', closeAttach);
 
   // ---------- Selecting and deleting messages ----------
   $('actDelete').addEventListener('click', function () {
@@ -1240,9 +1514,11 @@
   }
 
   function enqueue(job) {
-    var row = document.createElement('div'); row.className = 'row mine pending';
+    var row = document.createElement('div'); row.className = 'row mine pending' + (job.sticker ? ' stk' : '');
     var b = document.createElement('div'); b.className = 'bubble';
     if (job.reply) b.appendChild(makeQuote(job.reply));
+    if (job.gif) { var gi = document.createElement('img'); gi.className = 'pic gifimg'; gi.alt = 'GIF being sent'; gi.src = job.gif; b.appendChild(gi); }
+    if (job.sticker) { var si = document.createElement('img'); si.className = 'stkimg'; si.alt = 'Sticker being sent'; if (picCache[job.sticker]) si.src = picCache[job.sticker]; b.appendChild(si); }
     if (job.pic) { var im = document.createElement('img'); im.className = 'pic'; im.alt = 'Picture being sent'; im.src = job.pic; b.appendChild(im); }
     if (job.doc) b.appendChild(fileCard(job.doc.name, sizeLabel(job.doc.size)));
     if (job.voice) { var v = document.createElement('div'); v.className = 'text'; v.textContent = 'Voice message'; b.appendChild(v); }
@@ -1272,7 +1548,7 @@
       fr.readAsDataURL(job.doc);
     });
     ready.then(function (file) {
-      return api('sendMessage', { pass: pass, name: me, text: job.text, pic: job.pic, voice: job.voice, reply: job.reply || null, file: file });
+      return api('sendMessage', { pass: pass, name: me, text: job.text, pic: job.pic, voice: job.voice, reply: job.reply || null, file: file, sticker: job.sticker || '', gif: job.gif || '' });
     }).then(function () {
       sending = false; queue.shift();
       poll();
@@ -1409,6 +1685,19 @@
   });
 
   function usePicture(f) {
+    // An animated GIF is sent as it is, so it keeps moving
+    if (f.type === 'image/gif') {
+      if (f.size > 4 * 1024 * 1024) { setStatus('That GIF is ' + sizeLabel(f.size) + '. The limit is 4 MB.'); return; }
+      var fr = new FileReader();
+      fr.onload = function () {
+        pendingPic = String(fr.result);
+        $('previewImg').src = pendingPic;
+        $('preview').classList.remove('hidden');
+        setStatus('');
+      };
+      fr.readAsDataURL(f);
+      return;
+    }
     var url = URL.createObjectURL(f);
     var img = new Image();
     img.onload = function () {
