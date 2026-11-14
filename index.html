@@ -47,14 +47,37 @@
   .day span { background: #d5dbe4; color: #3c4756; font-size: 12px; padding: 4px 10px; border-radius: 999px; }
   .row { display: flex; margin: 4px 0; }
   .row.mine { justify-content: flex-end; }
-  .bubble { max-width: 82%; background: var(--theirs); border-radius: 14px 14px 14px 4px; padding: 8px 11px 6px; box-shadow: 0 1px 2px rgba(0,0,0,.08); }
+  .bubble { max-width: 78%; min-width: 0; background: var(--theirs); border-radius: 14px 14px 14px 4px; padding: 8px 11px 6px; box-shadow: 0 1px 2px rgba(0,0,0,.08); }
   .mine .bubble { background: var(--mine); border-radius: 14px 14px 4px 14px; }
   .text { white-space: pre-wrap; overflow-wrap: anywhere; line-height: 1.35; }
   .time { font-size: 11px; color: var(--muted); text-align: right; margin-top: 3px; }
   .stat { margin-left: 6px; font-weight: 600; }
   .stat.seen { color: #1a73e8; }
+  .rbtn { flex: none; align-self: center; border: 0; background: none; padding: 6px; cursor: pointer; opacity: .55; }
+  .rbtn svg { width: 18px; height: 18px; display: block; }
+  .quote { border-left: 3px solid var(--amber); background: rgba(0,0,0,.06); border-radius: 6px; padding: 4px 8px; margin-bottom: 4px; font-size: 13px; cursor: pointer; }
+  .quote b { display: block; color: var(--navy-2); font-size: 12px; }
+  .quote span { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; overflow-wrap: anywhere; color: #3c4756; }
+  .flash .bubble { animation: flash 1.2s; }
+  @keyframes flash { 0%, 60% { box-shadow: 0 0 0 3px var(--amber); } 100% { box-shadow: 0 1px 2px rgba(0,0,0,.08); } }
+  #older { display: block; margin: 4px auto 10px; border: 0; background: #d5dbe4; color: #3c4756; border-radius: 999px; padding: 7px 14px; font-size: 13px; cursor: pointer; }
+  #replybar { display: flex; align-items: center; gap: 10px; margin: 6px 10px 0; padding: 6px 10px; background: #fff; border-left: 3px solid var(--amber); border-radius: 8px; font-size: 13px; }
+  #replybar .grow { flex: 1; min-width: 0; }
+  #replybar b { display: block; color: var(--navy-2); font-size: 12px; }
+  #replybar span { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #3c4756; }
+  #replybar button { flex: none; border: 0; background: none; font-size: 20px; line-height: 1; color: var(--muted); cursor: pointer; padding: 4px 6px; }
+  .pending .bubble { opacity: .65; }
   .pic { display: block; max-width: 100%; max-height: 300px; border-radius: 10px; margin: 2px 0 4px; cursor: zoom-in; }
   .picwait { width: 180px; height: 120px; border-radius: 10px; background: rgba(0,0,0,.07); display: flex; align-items: center; justify-content: center; color: var(--muted); font-size: 13px; margin: 2px 0 4px; }
+  .voice { display: block; width: 240px; max-width: 100%; height: 40px; margin: 2px 0 4px; }
+  #recbar { display: flex; align-items: center; gap: 10px; padding: 8px 10px calc(10px + env(safe-area-inset-bottom)); }
+  #recbar .dot { width: 12px; height: 12px; border-radius: 50%; background: #d93025; animation: blink 1s infinite; }
+  #recbar .lbl { flex: 1; font-weight: 600; }
+  #recbar button { border: 0; border-radius: 22px; padding: 11px 16px; cursor: pointer; font-weight: 600; }
+  #recCancel { background: #d5dbe4; color: var(--ink); }
+  #recSend { background: var(--navy); color: #fff; }
+  @keyframes blink { 50% { opacity: .25; } }
+  #micBtn { background: #fff; border: 1px solid #c9d1dc; }
   #empty { text-align: center; color: var(--muted); margin-top: 40px; font-size: 14px; }
   #status { text-align: center; font-size: 12px; color: #b3261e; min-height: 16px; padding: 0 12px; overflow-wrap: anywhere; }
 
@@ -99,6 +122,10 @@
   </header>
   <div id="list"></div>
   <div id="status"></div>
+  <div id="replybar" class="hidden">
+    <div class="grow"><b id="replyName"></b><span id="replyText"></span></div>
+    <button id="replyCancel" type="button" aria-label="Cancel reply">&times;</button>
+  </div>
   <div id="preview" class="hidden">
     <img id="previewImg" alt="Picture to send">
     <button id="removePic" type="button">Remove</button>
@@ -107,10 +134,19 @@
     <button class="round" id="picBtn" type="button" aria-label="Add a picture">
       <svg viewBox="0 0 24 24" fill="none" stroke="#1f2f4a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="8.5" cy="10" r="1.5"/><path d="M21 15l-5-5L5 19"/></svg>
     </button>
+    <button class="round" id="micBtn" type="button" aria-label="Record a voice message">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#1f2f4a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>
+    </button>
     <textarea id="msgIn" rows="1" placeholder="Message" maxlength="4000"></textarea>
     <button class="round" id="sendBtn" type="button" aria-label="Send">
       <svg viewBox="0 0 24 24" fill="#fff"><path d="M3 20l18-8L3 4v6l12 2-12 2z"/></svg>
     </button>
+  </div>
+  <div id="recbar" class="hidden">
+    <span class="dot"></span>
+    <span class="lbl" id="recTime">Recording 0:00</span>
+    <button id="recCancel" type="button">Cancel</button>
+    <button id="recSend" type="button">Send</button>
   </div>
   <input id="fileIn" type="file" accept="image/*" class="hidden">
 </div>
@@ -120,10 +156,10 @@
 <script src="config.js"></script>
 <script>
   var API = (window.CHAT_API || '').trim();
-  var POLL_MS = 3500, KEEP = 200;
+  var KEEP = 500, firstRow = 0, replyTo = null, loadingOlder = false, hotUntil = 0, wantPoll = false, queue = [], pendingEls = [];
   var me = '', pass = '', lastRow = 0, lastDay = '', busy = false, sending = false, timer = null;
   var pendingPic = '', picCache = {}, items = [];
-  var seenRow = 0, otherDelivered = 0, otherSeen = 0, tick = 0, otherName = '';
+  var seenRow = 0, otherDelivered = 0, otherSeen = 0, otherName = '';
 
   function $(id) { return document.getElementById(id); }
   function store(k, v) { try { if (v === null) localStorage.removeItem(k); else localStorage.setItem(k, v); } catch (e) {} }
@@ -221,7 +257,7 @@
 
   // ---------- Messages ----------
   function resetList() {
-    lastRow = 0; lastDay = ''; seenRow = 0; otherDelivered = 0; otherSeen = 0; items = []; otherName = '';
+    lastRow = 0; lastDay = ''; firstRow = 0; setReply(null); seenRow = 0; otherDelivered = 0; otherSeen = 0; items = []; otherName = ''; queue = []; pendingEls = [];
     var list = $('list');
     while (list.firstChild) list.removeChild(list.firstChild);
     var empty = document.createElement('div');
@@ -236,8 +272,8 @@
   }
 
   function saveCache() {
-    if (items.length > KEEP) items = items.slice(items.length - KEEP);
-    store('chatCache', JSON.stringify({ items: items, last: lastRow, d: otherDelivered, s: otherSeen }));
+    var keep = items.length > KEEP ? items.slice(items.length - KEEP) : items;
+    store('chatCache', JSON.stringify({ items: keep, last: lastRow, d: otherDelivered, s: otherSeen }));
   }
 
   function dayLabel(d) {
@@ -247,6 +283,67 @@
     return d.toLocaleDateString([], { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
   }
 
+  function snippet(m) {
+    return m.text ? String(m.text).slice(0, 140) : m.pic ? 'Picture' : m.voice ? 'Voice message' : '';
+  }
+
+  function makeQuote(r) {
+    var q = document.createElement('div'); q.className = 'quote';
+    var nm = document.createElement('b'); nm.textContent = r.name === me ? 'You' : r.name;
+    var tx = document.createElement('span'); tx.textContent = r.text;
+    q.appendChild(nm); q.appendChild(tx);
+    q.addEventListener('click', function () {
+      var target = document.querySelector('.row[data-row="' + Number(r.id) + '"]');
+      if (!target) { setStatus('That message is further up. Tap "Load earlier messages" to find it.'); return; }
+      target.scrollIntoView({ block: 'center', behavior: 'smooth' });
+      target.classList.remove('flash'); void target.offsetWidth; target.classList.add('flash');
+    });
+    return q;
+  }
+
+  function daySep(d) {
+    var day = document.createElement('div'); day.className = 'day'; day.setAttribute('data-day', d.toDateString());
+    var sp = document.createElement('span'); sp.textContent = dayLabel(d);
+    day.appendChild(sp);
+    return day;
+  }
+
+  function buildRow(m) {
+    var d = new Date(m.t);
+    var mine = m.name === me;
+    var row = document.createElement('div'); row.className = 'row' + (mine ? ' mine' : '');
+    row.setAttribute('data-row', m.id);
+    var b = document.createElement('div'); b.className = 'bubble';
+    if (m.reply && m.reply.id) b.appendChild(makeQuote(m.reply));
+    if (m.pic) b.appendChild(makePic(m.pic));
+    if (m.voice) b.appendChild(makeVoice(m.voice));
+    if (m.text) { var tx = document.createElement('div'); tx.className = 'text'; tx.textContent = m.text; b.appendChild(tx); }
+    var tm = document.createElement('div'); tm.className = 'time';
+    tm.textContent = d.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+    tm.title = d.toLocaleString();
+    if (mine) {
+      var st = document.createElement('span'); st.className = 'stat';
+      st.setAttribute('data-id', m.id);
+      tm.appendChild(st);
+    }
+    b.appendChild(tm);
+    var rb = document.createElement('button'); rb.type = 'button'; rb.className = 'rbtn';
+    rb.setAttribute('aria-label', 'Reply to this message');
+    rb.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="#6b7686" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14L4 9l5-5"/><path d="M4 9h10a6 6 0 0 1 6 6v4"/></svg>';
+    rb.addEventListener('click', function () { setReply({ id: m.id, name: m.name, text: snippet(m) }); msgIn.focus(); });
+    if (mine) { row.appendChild(rb); row.appendChild(b); } else { row.appendChild(b); row.appendChild(rb); }
+    return row;
+  }
+
+  function setReply(r) {
+    replyTo = r;
+    if (!r) { $('replybar').classList.add('hidden'); return; }
+    $('replyName').textContent = 'Replying to ' + (r.name === me ? 'yourself' : r.name);
+    $('replyText').textContent = r.text;
+    $('replybar').classList.remove('hidden');
+  }
+  $('replyCancel').addEventListener('click', function () { setReply(null); });
+
   function addMessages(res, forceScroll) {
     if (!res) return;
     var list = $('list');
@@ -255,32 +352,16 @@
     (res.items || []).forEach(function (m) {
       if (m.id <= lastRow) return;
       lastRow = m.id;
+      if (!firstRow) firstRow = m.id;
       items.push(m);
       var empty = $('empty'); if (empty) empty.remove();
       var d = new Date(m.t);
       var dayKey = d.toDateString();
-      if (dayKey !== lastDay) {
-        lastDay = dayKey;
-        var day = document.createElement('div'); day.className = 'day';
-        var sp = document.createElement('span'); sp.textContent = dayLabel(d);
-        day.appendChild(sp); list.appendChild(day);
-      }
+      if (dayKey !== lastDay) { lastDay = dayKey; list.appendChild(daySep(d)); }
       var mine = m.name === me;
       if (!mine && m.name) otherName = m.name;
-      var row = document.createElement('div'); row.className = 'row' + (mine ? ' mine' : '');
-      var b = document.createElement('div'); b.className = 'bubble';
-      if (m.pic) b.appendChild(makePic(m.pic));
-      if (m.text) { var tx = document.createElement('div'); tx.className = 'text'; tx.textContent = m.text; b.appendChild(tx); }
-      var tm = document.createElement('div'); tm.className = 'time';
-      tm.textContent = d.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
-      tm.title = d.toLocaleString();
-      if (mine) {
-        var st = document.createElement('span'); st.className = 'stat';
-        st.setAttribute('data-id', m.id);
-        tm.appendChild(st);
-      }
-      b.appendChild(tm);
-      row.appendChild(b); list.appendChild(row);
+      if (mine && pendingEls.length) { var old = pendingEls.shift(); if (old.parentNode) old.parentNode.removeChild(old); }
+      list.appendChild(buildRow(m));
       added = true; if (mine) mineAdded = true;
     });
     if (res.last > lastRow) lastRow = res.last;
@@ -293,8 +374,58 @@
     }
     paintStatus();
     setTitle();
-    if (added || statusChanged) saveCache();
+    showOlderButton();
+    if (added || statusChanged) { saveCache(); hotUntil = Date.now() + 30000; }
     if (added && (forceScroll || nearBottom || mineAdded)) scrollDown();
+  }
+
+  // ---------- Earlier messages ----------
+  function showOlderButton() {
+    var btn = $('older');
+    if (firstRow > 2) {
+      if (!btn) {
+        btn = document.createElement('button'); btn.id = 'older'; btn.type = 'button';
+        btn.textContent = 'Load earlier messages';
+        btn.addEventListener('click', loadOlder);
+        $('list').insertBefore(btn, $('list').firstChild);
+      }
+    } else if (btn) btn.remove();
+  }
+
+  function loadOlder() {
+    if (loadingOlder || firstRow <= 2) return;
+    loadingOlder = true;
+    var btn = $('older'); if (btn) btn.textContent = 'Loading…';
+    api('getOlder', { pass: pass, before: firstRow, count: 300 }).then(function (res) {
+      loadingOlder = false;
+      var older = (res && res.items) || [];
+      if (!older.length) { firstRow = 2; showOlderButton(); return; }
+      var list = $('list');
+      var frag = document.createDocumentFragment(), prevDay = '';
+      older.forEach(function (m) {
+        var d = new Date(m.t), k = d.toDateString();
+        if (k !== prevDay) { prevDay = k; frag.appendChild(daySep(d)); }
+        if (m.name !== me && m.name && !otherName) otherName = m.name;
+        frag.appendChild(buildRow(m));
+      });
+      var b = $('older');
+      var after = b ? b.nextSibling : list.firstChild;
+      // Avoid showing the same date heading twice where the old and new parts meet
+      if (after && after.classList && after.classList.contains('day') && after.getAttribute('data-day') === prevDay) {
+        var dup = after; after = after.nextSibling; dup.remove();
+      }
+      var before = list.scrollHeight;
+      list.insertBefore(frag, after);
+      list.scrollTop += list.scrollHeight - before;
+      items = older.concat(items);
+      firstRow = older[0].id;
+      if (b) b.textContent = 'Load earlier messages';
+      paintStatus(); setTitle(); showOlderButton();
+    }).catch(function (err) {
+      loadingOlder = false;
+      var b = $('older'); if (b) b.textContent = 'Load earlier messages';
+      setStatus('Could not load earlier messages: ' + String(err && err.message || err));
+    });
   }
 
   // Sent -> Delivered -> Seen on my own messages
@@ -329,27 +460,56 @@
     return wait;
   }
 
+  function makeVoice(id) {
+    var wait = document.createElement('div'); wait.className = 'text'; wait.textContent = 'Loading voice message…';
+    function show(src) {
+      picCache[id] = src;
+      var a = document.createElement('audio'); a.className = 'voice'; a.controls = true; a.preload = 'metadata'; a.src = src;
+      if (wait.parentNode) wait.parentNode.replaceChild(a, wait);
+    }
+    if (picCache[id]) { setTimeout(function () { show(picCache[id]); }, 0); return wait; }
+    picLoad(id).then(function (saved) {
+      if (saved) { show(saved); return; }
+      return api('getPicture', { pass: pass, id: id }).then(function (src) { picSave(id, src); show(src); });
+    }).catch(function () { wait.textContent = 'Voice message could not load'; });
+    return wait;
+  }
+
   $('viewer').addEventListener('click', function () { $('viewer').classList.add('hidden'); });
 
   // ---------- Checking for new messages ----------
   function poll() {
-    if (busy || !pass) return;
-    // In the background, check less often; messages then count as delivered, not seen
-    tick++;
-    if (document.hidden) { if (tick % 3) return; } else { seenRow = lastRow; }
+    if (!pass) return;
+    if (busy) { wantPoll = true; return; }
+    if (!document.hidden) seenRow = lastRow;
     busy = true;
     api('getMessages', { pass: pass, after: lastRow || 1, name: me, seen: seenRow }).then(function (res) {
-      busy = false; $('status').textContent = '';
+      busy = false; if ($('status').getAttribute('data-net')) setStatus('');
       addMessages(res, false);
+      if (wantPoll) { wantPoll = false; poll(); }
     }).catch(function (err) {
-      busy = false;
+      busy = false; wantPoll = false;
       if (isWrongPass(err)) signOut('The passcode has changed. Please sign in again.');
-      else $('status').textContent = navigator.onLine === false ? 'No internet. Waiting to reconnect…' : 'Connection problem. Trying again…';
+      else setStatus(navigator.onLine === false ? 'No internet. Waiting to reconnect…' : 'Connection problem. Trying again…', true);
     });
   }
-  function startPolling() { stopPolling(); timer = setInterval(poll, POLL_MS); }
-  function stopPolling() { if (timer) { clearInterval(timer); timer = null; } }
-  document.addEventListener('visibilitychange', function () { if (!document.hidden) { seenRow = lastRow; poll(); } });
+  function setStatus(msg, net) {
+    $('status').textContent = msg;
+    if (net) $('status').setAttribute('data-net', '1'); else $('status').removeAttribute('data-net');
+  }
+  // Checks about every second while you are chatting, slower when idle or in the background
+  function nextDelay() {
+    if (document.hidden) return 10000;
+    return Date.now() < hotUntil ? 1000 : 2500;
+  }
+  function startPolling() {
+    stopPolling();
+    (function loop() { timer = setTimeout(function () { poll(); loop(); }, nextDelay()); })();
+  }
+  function stopPolling() { if (timer) { clearTimeout(timer); timer = null; } }
+  document.addEventListener('visibilitychange', function () {
+    if (!document.hidden && pass) { seenRow = lastRow; hotUntil = Date.now() + 30000; poll(); startPolling(); }
+  });
   window.addEventListener('online', poll);
 
   // ---------- Sending ----------
@@ -364,22 +524,125 @@
   });
   $('sendBtn').addEventListener('click', send);
 
+  // Shows the message at once, then sends it in the background, one at a time
   function send() {
-    if (sending) return;
     var text = msgIn.value.trim();
     if (!text && !pendingPic) return;
-    sending = true; $('sendBtn').disabled = true;
-    $('status').textContent = pendingPic ? 'Sending picture…' : '';
-    api('sendMessage', { pass: pass, name: me, text: text, pic: pendingPic }).then(function () {
-      sending = false; $('sendBtn').disabled = false; $('status').textContent = '';
-      msgIn.value = ''; msgIn.style.height = 'auto';
-      clearPic();
+    enqueue({ text: text, pic: pendingPic, voice: '', reply: replyTo });
+    setReply(null);
+    msgIn.value = ''; msgIn.style.height = 'auto';
+    clearPic();
+  }
+
+  function enqueue(job) {
+    var row = document.createElement('div'); row.className = 'row mine pending';
+    var b = document.createElement('div'); b.className = 'bubble';
+    if (job.reply) b.appendChild(makeQuote(job.reply));
+    if (job.pic) { var im = document.createElement('img'); im.className = 'pic'; im.alt = 'Picture being sent'; im.src = job.pic; b.appendChild(im); }
+    if (job.voice) { var v = document.createElement('div'); v.className = 'text'; v.textContent = 'Voice message'; b.appendChild(v); }
+    if (job.text) { var tx = document.createElement('div'); tx.className = 'text'; tx.textContent = job.text; b.appendChild(tx); }
+    var tm = document.createElement('div'); tm.className = 'time'; tm.textContent = 'Sending…';
+    b.appendChild(tm); row.appendChild(b);
+    var empty = $('empty'); if (empty) empty.remove();
+    $('list').appendChild(row);
+    scrollDown();
+    job.el = row;
+    pendingEls.push(row);
+    queue.push(job);
+    hotUntil = Date.now() + 30000;
+    setStatus('');
+    pump();
+  }
+
+  function pump() {
+    if (sending || !queue.length) return;
+    sending = true;
+    var job = queue[0];
+    api('sendMessage', { pass: pass, name: me, text: job.text, pic: job.pic, voice: job.voice, reply: job.reply || null }).then(function () {
+      sending = false; queue.shift();
       poll();
+      pump();
     }).catch(function (err) {
-      sending = false; $('sendBtn').disabled = false;
-      if (isWrongPass(err)) signOut('The passcode has changed. Please sign in again.');
-      else $('status').textContent = 'Message not sent. Please tap send again.';
+      sending = false;
+      // Give up on everything waiting, and put the typed text back so nothing is lost
+      var lost = queue; queue = [];
+      lost.forEach(function (j) {
+        var i = pendingEls.indexOf(j.el); if (i !== -1) pendingEls.splice(i, 1);
+        if (j.el.parentNode) j.el.parentNode.removeChild(j.el);
+      });
+      if (isWrongPass(err)) { signOut('The passcode has changed. Please sign in again.'); return; }
+      var texts = lost.map(function (j) { return j.text; }).filter(Boolean).join('\n');
+      if (texts && !msgIn.value) msgIn.value = texts;
+      setStatus('Not sent: ' + String(err && err.message || err) + '. Please send again.');
     });
+  }
+
+  // ---------- Voice messages ----------
+  var rec = null, recStream = null, recChunks = [], recTimer = null, recStart = 0, recSendIt = false, REC_MAX = 120;
+
+  function recMime() {
+    var types = ['audio/mp4', 'audio/webm;codecs=opus', 'audio/webm', 'audio/ogg'];
+    for (var i = 0; i < types.length; i++) {
+      try { if (MediaRecorder.isTypeSupported(types[i])) return types[i]; } catch (e) {}
+    }
+    return '';
+  }
+
+  $('micBtn').addEventListener('click', function () {
+    if (rec) return;
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia || typeof MediaRecorder === 'undefined') {
+      $('status').textContent = 'This phone or browser cannot record voice messages.';
+      return;
+    }
+    navigator.mediaDevices.getUserMedia({ audio: true }).then(function (stream) {
+      recStream = stream; recChunks = []; recSendIt = false;
+      var mime = recMime();
+      var opts = { audioBitsPerSecond: 32000 };
+      if (mime) opts.mimeType = mime;
+      try { rec = new MediaRecorder(stream, opts); } catch (e) { rec = new MediaRecorder(stream); }
+      rec.ondataavailable = function (ev) { if (ev.data && ev.data.size) recChunks.push(ev.data); };
+      rec.onstop = recDone;
+      rec.start();
+      recStart = Date.now();
+      $('status').textContent = '';
+      $('composer').classList.add('hidden');
+      $('recbar').classList.remove('hidden');
+      $('recTime').textContent = 'Recording 0:00';
+      recTimer = setInterval(function () {
+        var s = Math.floor((Date.now() - recStart) / 1000);
+        $('recTime').textContent = 'Recording ' + Math.floor(s / 60) + ':' + ('0' + (s % 60)).slice(-2);
+        if (s >= REC_MAX) recStop(true);
+      }, 500);
+    }).catch(function () {
+      $('status').textContent = 'Microphone not allowed. Allow the microphone for this app and try again.';
+    });
+  });
+  $('recCancel').addEventListener('click', function () { recStop(false); });
+  $('recSend').addEventListener('click', function () { recStop(true); });
+
+  function recStop(sendIt) {
+    if (!rec) return;
+    recSendIt = sendIt;
+    if (recTimer) { clearInterval(recTimer); recTimer = null; }
+    try { rec.stop(); } catch (e) { recDone(); }
+  }
+
+  function recDone() {
+    var type = ((rec && rec.mimeType) || 'audio/webm').split(';')[0];
+    var chunks = recChunks, sendIt = recSendIt;
+    if (recStream) recStream.getTracks().forEach(function (t) { t.stop(); });
+    rec = null; recStream = null; recChunks = [];
+    $('recbar').classList.add('hidden');
+    $('composer').classList.remove('hidden');
+    if (!sendIt || !chunks.length) return;
+    var fr = new FileReader();
+    fr.onload = function () {
+      var b64 = String(fr.result).split('base64,')[1] || '';
+      if (!b64) { $('status').textContent = 'The recording was empty. Please try again.'; return; }
+      enqueue({ text: '', pic: '', voice: 'data:' + type + ';base64,' + b64, reply: replyTo });
+      setReply(null);
+    };
+    fr.readAsDataURL(new Blob(chunks, { type: type }));
   }
 
   // ---------- Choosing a picture ----------
@@ -437,7 +700,7 @@
         startPolling();
       }).catch(function (err) {
         if (isWrongPass(err)) signOut('The passcode has changed. Please sign in again.');
-        else { $('status').textContent = 'Connection problem. Trying again…'; lastRow = 0; startPolling(); }
+        else { setStatus('Connection problem. Trying again…', true); lastRow = 0; startPolling(); }
       });
     }
   })();
