@@ -44,6 +44,7 @@
   header .grow { flex: 1; min-width: 0; }
   header .title { font-weight: 700; font-size: 17px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   header .who.typing { color: var(--amber); opacity: 1; font-weight: 600; }
+  header .who.online { color: #6ddc8b; opacity: 1; font-weight: 600; }
   header .who { font-size: 12px; opacity: .8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .hbtn { flex: none; width: 38px; height: 38px; border-radius: 50%; border: 0; background: transparent; cursor: pointer; display: flex; align-items: center; justify-content: center; }
   .hbtn svg { width: 21px; height: 21px; }
@@ -117,7 +118,7 @@
   #composer { display: flex; align-items: flex-end; gap: 5px; padding: 8px 8px calc(10px + env(safe-area-inset-bottom)); }
   #composer textarea { flex: 1; min-width: 0; resize: none; border: 1px solid var(--line); border-radius: 22px; padding: 11px 14px; max-height: 120px; line-height: 1.3; background: #fff; }
   .round { flex: none; width: 44px; height: 44px; border-radius: 50%; border: 0; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-  #micBtn, #stkBtn, #attBtn { background: #fff; border: 1px solid var(--line); }
+  #micBtn, #stkBtn, #attBtn, #camBtn { background: #fff; border: 1px solid var(--line); }
   .round { width: 42px; height: 42px; }
   .round svg { width: 21px; height: 21px; }
   #sendBtn { background: var(--navy); }
@@ -194,7 +195,7 @@
     --bg: #0e141c; --mine: #1d4a7c; --theirs: #1c2735; --ink: #e7ecf3; --muted: #93a0b4; --line: #2e3b4e;
     --surface: #18222f; --soft: #243245; --soft-ink: #c3cddc;
   }
-  .card, #pinbar, #replybar, #sheet .box, #attach .box, #stk .box, .item, .chip, #who2 button, #micBtn, #stkBtn, #attBtn, #docbar,
+  .card, #pinbar, #replybar, #sheet .box, #attach .box, #stk .box, .item, .chip, #who2 button, #micBtn, #stkBtn, #attBtn, #camBtn, #docbar,
   #composer textarea, .card input, #searchForm input, #gifForm input { background: var(--surface); color: var(--ink); }
   .card { box-shadow: 0 6px 24px rgba(0,0,0,.45); }
   .card h1 { color: var(--ink); }
@@ -269,17 +270,20 @@
     <button id="removeDoc" type="button">Remove</button>
   </div>
   <div id="composer">
-    <button class="round" id="stkBtn" type="button" aria-label="Stickers and emoji">
+    <button class="round" id="attBtn" type="button" aria-label="Attach a photo or document">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#c3cddc" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+    </button>
+    <button class="round" id="stkBtn" type="button" aria-label="Stickers, emoji and GIFs">
       <svg viewBox="0 0 24 24" fill="none" stroke="#c3cddc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8.5 14.5a4.5 4.5 0 0 0 7 0"/><path d="M9 9.5v.5M15 9.5v.5"/></svg>
     </button>
     <textarea id="msgIn" rows="1" placeholder="Message" maxlength="4000"></textarea>
-    <button class="round" id="attBtn" type="button" aria-label="Attach a picture or document">
-      <svg viewBox="0 0 24 24" fill="none" stroke="#c3cddc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11.5l-8.2 8.2a5 5 0 0 1-7.1-7.1l8.6-8.6a3.4 3.4 0 0 1 4.8 4.8l-8.5 8.5a1.8 1.8 0 0 1-2.5-2.5l7.8-7.8"/></svg>
+    <button class="round" id="camBtn" type="button" aria-label="Send a photo">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#c3cddc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/><circle cx="12" cy="13" r="3.5"/></svg>
     </button>
     <button class="round" id="micBtn" type="button" aria-label="Record a voice message">
       <svg viewBox="0 0 24 24" fill="none" stroke="#c3cddc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>
     </button>
-    <button class="round" id="sendBtn" type="button" aria-label="Send">
+    <button class="round hidden" id="sendBtn" type="button" aria-label="Send">
       <svg viewBox="0 0 24 24" fill="#14202f"><path d="M3 20l18-8L3 4v6l12 2-12 2z"/></svg>
     </button>
   </div>
@@ -291,6 +295,7 @@
   </div>
   <input id="fileIn" type="file" accept="image/*" class="hidden">
   <input id="docIn" type="file" class="hidden">
+  <input id="capIn" type="file" accept="image/*" capture="environment" class="hidden">
 </div>
 
 <!-- Message menu: reactions, reply, pin, copy -->
@@ -309,7 +314,8 @@
 <!-- Attach: picture or document -->
 <div id="attach" class="shade hidden">
   <div class="box">
-    <button class="act" id="picBtn" type="button">Picture or GIF</button>
+    <button class="act" id="picBtn" type="button">Photo or GIF from the phone</button>
+    <button class="act" id="capBtn" type="button">Take a photo with the camera</button>
     <button class="act" id="docBtn" type="button">Document</button>
     <button class="act" id="attClose" type="button">Cancel</button>
   </div>
@@ -353,6 +359,9 @@
 <div id="viewer" class="hidden"><img id="viewerImg" alt="Picture"></div>
 
 <script src="config.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 <script>
   var API = (window.CHAT_API || '').trim();
   var USERS = ['MH', 'JH'], pick = '';
@@ -361,6 +370,7 @@
   var pendingPic = '', picCache = {}, items = [], byId = {};
   var seenRow = 0, otherDelivered = 0, otherSeen = 0, otherName = '';
   var hotUntil = 0, wantPoll = false, queue = [], pendingEls = [];
+  var presence = null;
   var stickers = null, stkEditing = false;
   // Key for the GIPHY GIF search (can also be set as window.GIPHY_KEY in config.js)
   var GIPHY_KEY = window.GIPHY_KEY || 'o9sMkdws363zYPGxDocg7RB3TNJJbMff', gifSeq = 0, gifLoaded = false;
@@ -370,6 +380,8 @@
   var typedAt = 0, typingSent = false, otherTyping = false;
   var swipe = null, swipedAt = 0;
   var selecting = false, selected = {}, delArmed = 0;
+  var fb = null, auth = null, TS = null, srvOffset = 0, lastOwnId = 0, noOlder = false, unsent = {};
+  var PAGE = 300, entered = false, booted = false, loginMsg = '', searchAll = null, searchAt = 0;
   var replyTo = null, loadingOlder = false, rv = null, pv = -1, pins = [], sheetMsg = null;
 
   function $(id) { return document.getElementById(id); }
@@ -442,43 +454,68 @@
     $('who2').appendChild(b);
   });
 
+  function emailOf(name) { return String(name).toLowerCase() + '@sukoon.chat'; }
+  function nameOfEmail(email) { return known(String(email || '').split('@')[0]); }
+
   $('loginForm').addEventListener('submit', function (ev) {
     ev.preventDefault();
     var n = pick, p = $('passIn').value;
     if (!n) { $('loginErr').textContent = 'Please choose ' + USERS.join(' or ') + ' first.'; return; }
     if (!p) return;
+    if (!auth) { $('loginErr').textContent = 'The app could not start. Check your internet and reopen it.'; return; }
     $('loginBtn').disabled = true;
     $('loginErr').textContent = '';
-    api('getMessages', { pass: p, after: 0, name: '', seen: 0 }).then(function (res) {
-      $('loginBtn').disabled = false;
-      // Sides are decided by name, so keep to the names already used in this chat
-      var names = (res.names || []).filter(Boolean), match = '';
-      names.forEach(function (x) { if (same(x, n)) match = x; });
-      if (!match && names.length >= 2) {
-        $('loginErr').textContent = 'This chat already has: ' + names.join(', ') + '. Please type your name exactly as one of these.';
-        return;
-      }
-      me = match || n; pass = p;
-      store('chatName', me); store('chatPass', p);
-      openChat();
-      resetList();
-      addMessages(res, true);
-      startPolling();
-      poll();
+    // The passcode is also needed for pictures and files, so it is kept on this phone
+    store('chatName', n); store('chatPass', p);
+    auth.signInWithEmailAndPassword(emailOf(n), p).then(function () {
+      $('loginBtn').disabled = false; // the chat opens from onAuth below
     }).catch(function (err) {
       $('loginBtn').disabled = false;
-      $('loginErr').textContent = isWrongPass(err) ? 'Wrong passcode. Please try again.' : 'Could not connect: ' + errText(err);
+      store('chatPass', null);
+      var c = String(err && err.code || '');
+      $('loginErr').textContent =
+        /wrong-password|invalid-credential|invalid-login|user-not-found/.test(c) ? 'Wrong passcode. Please try again.' :
+        /too-many-requests/.test(c) ? 'Too many tries. Please wait a few minutes and try again.' :
+        /network/.test(c) ? 'No internet. Check your connection and try again.' :
+        'Could not sign in: ' + errText(err);
     });
   });
+
+  // Shows the chat for this person, starting from the copy saved on this phone
+  function enter(n) {
+    if (entered && me === n) return;
+    me = n; pass = load('chatPass'); entered = true;
+    openChat();
+    resetList();
+    var saved = null;
+    try { saved = JSON.parse(load('chatCache') || 'null'); } catch (e) {}
+    if (saved && saved.items && saved.items.length) {
+      addMessages({ items: saved.items, status: { delivered: saved.d, seen: saved.s } }, true);
+    }
+  }
+
+  // Firebase tells us who is signed in (also when the app is reopened)
+  function onAuth(user) {
+    if (user) {
+      var n = nameOfEmail(user.email);
+      if (!n || !load('chatPass')) { signOut('Please sign in again.'); return; }
+      enter(n);
+      if (!booted) { booted = true; boot(); }
+    } else {
+      unboot();
+      entered = false; booted = false; me = '';
+      var msg = loginMsg; loginMsg = '';
+      showLogin(msg);
+    }
+  }
 
   function openChat() {
     $('login').classList.add('hidden');
     $('chat').classList.remove('hidden');
-    $('who').textContent = 'You are ' + me; $('who').className = 'who';
+    paintWho();
   }
 
   function showLogin(msg) {
-    stopPolling();
     closeSheet(); closePanel(); endSelect(); closeStk(); closeAttach();
     $('chat').classList.add('hidden');
     $('login').classList.remove('hidden');
@@ -488,18 +525,30 @@
   }
 
   function signOut(msg) {
+    loginMsg = msg || '';
     store('chatPass', null); store('chatCache', null);
     picWipe(); picCache = {};
     pass = '';
-    showLogin(msg || '');
+    var done = function () {
+      if (auth && auth.currentUser) auth.signOut().catch(function () { onAuth(null); });
+      else onAuth(null);
+    };
+    // Mark me offline first; after signing out Firebase no longer accepts my writes
+    if (fb && me && auth && auth.currentUser) {
+      var t = setTimeout(done, 1500), once = false;
+      fb.ref('state/' + me).update({ on: false, ls: TS, ty: null }).catch(function () {}).then(function () {
+        if (once) return; once = true; clearTimeout(t); done();
+      });
+    } else done();
   }
   $('logoutBtn').addEventListener('click', function () { signOut(''); });
 
   // ---------- Messages ----------
   function resetList() {
-    lastRow = 0; firstRow = 0; lastDay = ''; seenRow = 0; otherDelivered = 0; otherSeen = 0;
-    items = []; byId = {}; otherName = ''; queue = []; pendingEls = [];
-    rv = null; pv = -1; pins = []; otherTyping = false; typingSent = false; typedAt = 0;
+    lastRow = 0; firstRow = 0; lastDay = ''; otherDelivered = 0; otherSeen = 0;
+    items = []; byId = {}; otherName = ''; queue = [];
+    pins = []; presence = null; otherTyping = false; typedAt = 0;
+    noOlder = false; unsent = {}; searchAll = null; lastOwnId = 0;
     setReply(null); paintPins();
     var list = $('list');
     while (list.firstChild) list.removeChild(list.firstChild);
@@ -510,13 +559,15 @@
   }
 
   function setTitle() {
-    $('title').textContent = otherName || 'Sukoon';
-    $('avatar').textContent = (otherName || 'S').charAt(0).toUpperCase();
+    var nm = otherName || partner() || 'Sukoon';
+    $('title').textContent = nm;
+    $('avatar').textContent = nm.charAt(0).toUpperCase();
   }
 
   function saveCache() {
+    if (!me) return;
     var keep = items.length > KEEP ? items.slice(items.length - KEEP) : items;
-    store('chatCache', JSON.stringify({ items: keep, last: lastRow, d: otherDelivered, s: otherSeen, rv: rv }));
+    store('chatCache', JSON.stringify({ items: keep, d: otherDelivered, s: otherSeen }));
   }
 
   function dayLabel(d) {
@@ -624,12 +675,11 @@
 
   function addMessages(res, forceScroll) {
     if (!res) return;
-    if (res.resync) { fullReload(); return; }
     var list = $('list');
     var nearBottom = list.scrollHeight - list.scrollTop - list.clientHeight < 120;
     var added = false, mineAdded = false, incoming = [];
     (res.items || []).forEach(function (m) {
-      if (m.id <= lastRow) return;
+      if (!(m.id > lastRow)) return;
       lastRow = m.id;
       if (!firstRow) firstRow = m.id;
       items.push(m);
@@ -640,11 +690,9 @@
       var mine = isMe(m.name);
       if (!mine && m.name) otherName = m.name;
       if (!mine && !m.del && !forceScroll) incoming.push(m);
-      if (mine && pendingEls.length) { var old = pendingEls.shift(); if (old.parentNode) old.parentNode.removeChild(old); }
       list.appendChild(buildRow(m));
       added = true; if (mine) mineAdded = true;
     });
-    if (res.last > lastRow) lastRow = res.last;
     var changed = false;
     if (res.status) {
       var nd = Math.max(otherDelivered, res.status.delivered || 0);
@@ -652,18 +700,14 @@
       changed = nd !== otherDelivered || ns !== otherSeen;
       otherDelivered = nd; otherSeen = ns;
     }
-    if (res.rx && res.rx.length) {
-      res.rx.forEach(function (e) { if (e.del) e.del.forEach(function (id) { markDeleted(id, e.by); }); else applyRx(e.id, e.r); });
-      changed = true;
-    }
-    if (typeof res.rv === 'number' && res.rv !== rv) { rv = res.rv; changed = true; }
-    if (res.pins) { pins = res.pins; pv = res.pv; paintPins(); }
-    if (typeof res.typing === 'boolean') setOtherTyping(res.typing && !(res.items || []).some(function (m) { return !isMe(m.name); }));
+    if (res.pins) { pins = res.pins; paintPins(); }
+    if (res.other) { presence = res.other; paintWho(); }
+    if (typeof res.typing === 'boolean') setOtherTyping(res.typing);
+    if (incoming.length) setOtherTyping(false);
     paintStatus();
     setTitle();
     showOlderButton();
-    if (added || changed) { saveCache(); }
-    if (added) hotUntil = Date.now() + 30000;
+    if (added || changed) saveCacheSoon();
     if (added && (forceScroll || nearBottom || mineAdded)) scrollDown();
     notifyIncoming(incoming);
   }
@@ -672,16 +716,31 @@
   function setOtherTyping(on) {
     if (on === otherTyping) return;
     otherTyping = on;
-    $('who').textContent = on ? 'typing…' : 'You are ' + me;
-    $('who').className = 'who' + (on ? ' typing' : '');
-    if (on) hotUntil = Date.now() + 15000;
+    paintWho();
   }
 
-  function fullReload() {
-    store('chatCache', null);
-    resetList();
-    api('getMessages', { pass: pass, after: 0, name: me, seen: 0 }).then(function (res) { addMessages(res, true); })
-      .catch(function (err) { if (isWrongPass(err)) signOut('Please sign in again.'); });
+  function partner() {
+    var found = '';
+    USERS.forEach(function (u) { if (!same(u, me)) found = found || u; });
+    return found;
+  }
+
+  function seenLabel(t) {
+    var d = new Date(t), today = new Date(), y = new Date(); y.setDate(today.getDate() - 1);
+    var time = d.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+    if (d.toDateString() === today.toDateString()) return 'last seen today at ' + time;
+    if (d.toDateString() === y.toDateString()) return 'last seen yesterday at ' + time;
+    return 'last seen ' + d.toLocaleDateString([], { day: 'numeric', month: 'short' }) + ' at ' + time;
+  }
+
+  // The line under the name: typing, online, last seen, or who you are
+  function paintWho() {
+    var text = 'You are ' + me, cls = 'who';
+    if (otherTyping) { text = 'typing…'; cls = 'who typing'; }
+    else if (presence && presence.online) { text = 'online'; cls = 'who online'; }
+    else if (presence && presence.seen) { text = seenLabel(presence.seen); }
+    if ($('who').textContent !== text) $('who').textContent = text;
+    $('who').className = cls;
   }
 
   // Sent -> Delivered -> Seen on my own messages
@@ -689,9 +748,9 @@
     var els = document.querySelectorAll('.stat');
     for (var i = 0; i < els.length; i++) {
       var id = Number(els[i].getAttribute('data-id'));
-      var label = id <= otherSeen ? '✓✓ Seen' : id <= otherDelivered ? '✓✓ Delivered' : '✓ Sent';
+      var label = unsent[id] ? 'Sending\u2026' : id <= otherSeen ? '\u2713\u2713 Seen' : id <= otherDelivered ? '\u2713\u2713 Delivered' : '\u2713 Sent';
       if (els[i].textContent !== label) els[i].textContent = label;
-      els[i].className = 'stat' + (id <= otherSeen ? ' seen' : '');
+      els[i].className = 'stat' + (!unsent[id] && id <= otherSeen ? ' seen' : '');
     }
   }
 
@@ -700,31 +759,30 @@
   // ---------- Earlier messages ----------
   function showOlderButton() {
     var btn = $('older');
-    if (firstRow > 2) {
+    if (firstRow && !noOlder) {
       if (!btn) {
         btn = document.createElement('button'); btn.id = 'older'; btn.type = 'button';
         btn.textContent = 'Load earlier messages';
-        btn.addEventListener('click', function () { loadOlder(300); });
+        btn.addEventListener('click', function () { loadOlder(0); });
         $('list').insertBefore(btn, $('list').firstChild);
       }
     } else if (btn) btn.remove();
   }
 
-  function loadOlder(count) {
-    if (loadingOlder || firstRow <= 2) return Promise.resolve(false);
+  // Loads the 300 messages before the oldest one shown, or everything back to "downTo"
+  function loadOlder(downTo) {
+    if (loadingOlder || noOlder || !firstRow || !fb) return Promise.resolve(false);
     loadingOlder = true;
     var btn = $('older'); if (btn) btn.textContent = 'Loading…';
-    return api('getOlder', { pass: pass, before: firstRow, count: count || 300 }).then(function (res) {
+    var q = fb.ref('msgs').orderByKey().endAt(K(firstRow - 1));
+    q = downTo ? q.startAt(K(downTo)) : q.limitToLast(PAGE);
+    return q.once('value').then(function (snap) {
       loadingOlder = false;
-      var older = (res && res.items) || [];
-      if (!older.length) {
-        // That stretch was all deleted messages: keep going from where the server stopped
-        var more = res && res.start > 2 && res.start < firstRow;
-        firstRow = more ? res.start : 2;
-        var ob = $('older'); if (ob) ob.textContent = 'Load earlier messages';
-        showOlderButton();
-        return more;
-      }
+      var older = [];
+      snap.forEach(function (c) { var m = toMsg(c.key, c.val()); if (m.id > 0 && !byId[m.id]) older.push(m); });
+      if (!downTo && older.length < PAGE) noOlder = true;
+      var ob = $('older'); if (ob) ob.textContent = 'Load earlier messages';
+      if (!older.length) { if (!downTo) noOlder = true; showOlderButton(); return false; }
       var list = $('list');
       var frag = document.createDocumentFragment(), prevDay = '';
       older.forEach(function (m) {
@@ -743,9 +801,9 @@
       list.insertBefore(frag, after);
       list.scrollTop += list.scrollHeight - before;
       items = older.concat(items);
-      firstRow = res.start || older[0].id;
-      if (b) b.textContent = 'Load earlier messages';
+      firstRow = older[0].id;
       paintStatus(); paintPins(); setTitle(); showOlderButton();
+      attachLive(); // also follow changes to the messages just loaded
       return true;
     }).catch(function (err) {
       loadingOlder = false;
@@ -765,10 +823,10 @@
       target.classList.remove('flash'); void target.offsetWidth; target.classList.add('flash');
       return;
     }
-    if (!(id >= 2) || id >= firstRow || firstRow <= 2) { setStatus('That message could not be found.'); return; }
+    if (!(id > 0) || id >= firstRow || noOlder) { setStatus('That message could not be found.'); return; }
     setStatus('Finding that message…');
-    loadOlder(Math.min(500, firstRow - id + 30)).then(function (ok) {
-      if (ok) jumpTo(id); else setStatus('That message could not be found.');
+    loadOlder(id).then(function () {
+      if (rowOf(id)) jumpTo(id); else setStatus('That message could not be found.');
     });
   }
 
@@ -801,6 +859,7 @@
 
   // A GIF from the GIPHY search plays straight from GIPHY's servers
   function makeGif(url) {
+    if (!/^https:\/\/media\d*\.giphy\.com\//.test(String(url))) { var bad = document.createElement('div'); bad.className = 'text'; bad.textContent = 'GIF'; return bad; }
     var img = document.createElement('img'); img.className = 'pic gifimg'; img.alt = 'GIF'; img.loading = 'lazy'; img.src = url;
     var list = $('list');
     var nearBottom = list.scrollHeight - list.scrollTop - list.clientHeight < 200;
@@ -929,16 +988,13 @@
     return found;
   }
 
-  // Shows the reaction at once; tapping the same emoji again removes it
+  // Tapping the same emoji again removes it. Firebase shows the change on both phones.
   function sendReact(m, emoji) {
-    var r = {}, old = m.rx || {};
-    Object.keys(old).forEach(function (n) { if (!isMe(n)) r[n] = old[n]; });
-    if (myReaction(m) !== emoji) r[me] = emoji;
-    applyRx(m.id, r);
-    api('react', { pass: pass, name: me, id: m.id, emoji: emoji }).then(function (res) {
-      applyRx(res.id, res.r); saveCache();
-    }).catch(function (err) {
-      applyRx(m.id, old);
+    if (!fb || !byId[m.id] || m.del) return;
+    var mine = myReaction(m), up = {};
+    Object.keys(m.rx || {}).forEach(function (n) { if (isMe(n)) up[n] = null; });
+    if (mine !== emoji) up[me] = emoji;
+    fb.ref('msgs/' + K(m.id) + '/rx').update(up).catch(function (err) {
       setStatus('Reaction not saved: ' + errText(err));
     });
   }
@@ -1042,7 +1098,7 @@
         b.appendChild(img);
         b.addEventListener('click', function () {
           closeStk();
-          enqueue({ text: '', pic: '', voice: '', reply: replyTo, gif: send.url });
+          post({ text: '', pic: '', voice: '', reply: replyTo, gif: send.url });
           setReply(null);
         });
         grid.appendChild(b);
@@ -1102,7 +1158,7 @@
           return;
         }
         closeStk();
-        enqueue({ text: '', pic: '', voice: '', reply: replyTo, sticker: id });
+        post({ text: '', pic: '', voice: '', reply: replyTo, sticker: id });
         setReply(null);
       });
       grid.appendChild(b);
@@ -1113,7 +1169,7 @@
     var b = document.createElement('button'); b.type = 'button'; b.textContent = e;
     b.addEventListener('click', function () {
       closeStk();
-      enqueue({ text: e, pic: '', voice: '', reply: replyTo });
+      post({ text: e, pic: '', voice: '', reply: replyTo });
       setReply(null);
     });
     $('emoGrid').appendChild(b);
@@ -1156,6 +1212,9 @@
   $('attClose').addEventListener('click', closeAttach);
   $('attach').addEventListener('click', function (ev) { if (ev.target === $('attach')) closeAttach(); });
   $('picBtn').addEventListener('click', closeAttach);
+  $('camBtn').addEventListener('click', function () { $('fileIn').click(); });
+  $('capBtn').addEventListener('click', function () { closeAttach(); $('capIn').click(); });
+  $('capIn').addEventListener('change', function () { var f = this.files && this.files[0]; if (f) usePicture(f); });
   $('docBtn').addEventListener('click', closeAttach);
 
   // ---------- Selecting and deleting messages ----------
@@ -1203,15 +1262,22 @@
       setTimeout(function () { if (selecting && Date.now() >= delArmed) $('selDelete').textContent = 'Delete'; }, 4100);
       return;
     }
-    $('selDelete').disabled = true; $('selDelete').textContent = 'Deleting…';
-    api('del', { pass: pass, name: me, ids: ids }).then(function (res) {
-      ((res && res.del) || []).forEach(function (id) { markDeleted(id, res.by); });
-      endSelect(); saveCache(); setStatus('');
-    }).catch(function (err) {
-      endSelect();
-      if (isWrongPass(err)) signOut('Please sign in again.');
-      else setStatus('Could not delete: ' + errText(err));
+    var up = {}, files = [];
+    ids.forEach(function (id) {
+      var m = byId[id];
+      if (!m || m.del) return;
+      up['msgs/' + K(id)] = { t: m.t, name: m.name, del: true, by: me };
+      up['pins/' + K(id)] = null;
+      if (m.pic && !m.stk) files.push(m.pic);
+      if (m.voice) files.push(m.voice);
+      if (m.file && m.file.id) files.push(m.file.id);
     });
+    endSelect();
+    if (!Object.keys(up).length) return;
+    fb.ref().update(up).then(function () {
+      // The picture, voice or document file goes to the Google Drive bin
+      if (files.length) api('trash', { pass: pass, ids: files }).catch(function () {});
+    }).catch(function (err) { setStatus('Could not delete: ' + errText(err)); });
   });
 
   // Swaps a message for its "deleted" note, on this phone
@@ -1231,10 +1297,14 @@
 
   // ---------- Pinned messages ----------
   function setPin(id, on) {
-    api('pin', { pass: pass, id: id, on: on }).then(function (res) {
-      pins = res.pins || []; pv = res.pv; paintPins();
-      if (!$('panel').classList.contains('hidden') && panelMode === 'pins') showPins();
-    }).catch(function (err) { setStatus('Could not change the pin: ' + errText(err)); });
+    var up = {};
+    if (on) {
+      var m = byId[id];
+      if (!m || m.del) return;
+      up['pins/' + K(id)] = { id: id, name: m.name, text: snippet(m).slice(0, 80), t: m.t, at: TS };
+      if (pins.length >= 10) up['pins/' + K(pins[0].id)] = null; // only ten pins: the oldest drops off
+    } else up['pins/' + K(id)] = null;
+    fb.ref().update(up).catch(function (err) { setStatus('Could not change the pin: ' + errText(err)); });
   }
 
   function paintPins() {
@@ -1305,13 +1375,24 @@
   });
   $('searchForm').addEventListener('submit', function (ev) {
     ev.preventDefault();
-    var q = $('searchIn').value.trim();
+    var q = $('searchIn').value.trim().toLowerCase();
     if (!q) return;
     panelNote('Searching…');
-    api('search', { pass: pass, q: q }).then(function (res) {
+    // The whole chat is fetched once and then searched on this phone
+    var ready = searchAll && Date.now() - searchAt < 60000 ? Promise.resolve(searchAll) :
+      fb.ref('msgs').once('value').then(function (snap) {
+        var all = [];
+        snap.forEach(function (c) { var m = toMsg(c.key, c.val()); if (!m.del && m.text) all.push(m); });
+        searchAll = all; searchAt = Date.now();
+        return all;
+      });
+    ready.then(function (all) {
       if (panelMode !== 'search') return;
-      var found = (res && res.items) || [];
-      if (!found.length) { panelNote('No messages contain "' + q + '".'); return; }
+      var found = [];
+      for (var i = all.length - 1; i >= 0 && found.length < 50; i--) {
+        if (all[i].text.toLowerCase().indexOf(q) !== -1) found.push({ id: all[i].id, t: all[i].t, name: all[i].name, text: all[i].text.slice(0, 160) });
+      }
+      if (!found.length) { panelNote('No messages contain "' + $('searchIn').value.trim() + '".'); return; }
       panelItems(found, false);
     }).catch(function (err) { panelNote('Search did not work: ' + errText(err)); });
   });
@@ -1389,26 +1470,6 @@
   window.addEventListener('focus', clearUnread);
   document.addEventListener('visibilitychange', clearUnread);
 
-  // ---------- Checking for new messages ----------
-  function poll() {
-    if (!pass) return;
-    if (busy) { wantPoll = true; return; }
-    if (!document.hidden) seenRow = lastRow;
-    busy = true;
-    // Tell the other person while I am typing, and once more when I stop
-    var typingNow = !document.hidden && !!msgIn.value && Date.now() - typedAt < 4000, tflag;
-    if (typingNow) { tflag = 1; typingSent = true; }
-    else if (typingSent) { tflag = 0; typingSent = false; }
-    api('getMessages', { pass: pass, after: lastRow || 1, name: me, seen: seenRow, rv: rv, pv: pv, typing: tflag }).then(function (res) {
-      busy = false; if ($('status').getAttribute('data-net')) setStatus('');
-      addMessages(res, false);
-      if (wantPoll) { wantPoll = false; poll(); }
-    }).catch(function (err) {
-      busy = false; wantPoll = false;
-      if (isWrongPass(err)) signOut('Please sign in again.');
-      else setStatus(navigator.onLine === false ? 'No internet. Waiting to reconnect…' : 'Connection problem. Trying again…', true);
-    });
-  }
   // A neutral note that clears itself after a few seconds
   function setInfo(msg) {
     setStatus(msg);
@@ -1420,20 +1481,249 @@
     $('status').textContent = msg;
     if (net) $('status').setAttribute('data-net', '1'); else $('status').removeAttribute('data-net');
   }
-  // Checks about every second while you are chatting, slower when idle or in the background
-  function nextDelay() {
-    if (document.hidden) return 10000;
-    return Date.now() < hotUntil ? 1000 : 2500;
+
+  // ---------- Firebase: live messages, seen, typing and online ----------
+  // Every message has a number as its id. New ones use the time they were sent, so they
+  // sort in order; messages copied from the old sheet keep their row number.
+  function K(id) { var s = String(Math.floor(id)); while (s.length < 14) s = '0' + s; return 'm' + s; }
+  function idOf(key) { return Number(String(key).slice(1)); }
+  function nowMs() { return Date.now() + srvOffset; }
+  function newId() {
+    var idx = USERS.indexOf(me) + 1 || 9;
+    var id = Math.floor(nowMs()) * 10 + idx;
+    var floor = Math.max(lastOwnId, lastRow);
+    if (id <= floor) id = (Math.floor(floor / 10) + 1) * 10 + idx;
+    lastOwnId = id;
+    return id;
   }
-  function startPolling() {
-    stopPolling();
-    (function loop() { timer = setTimeout(function () { poll(); loop(); }, nextDelay()); })();
+
+  function toMsg(key, v) {
+    v = v || {};
+    var id = idOf(key), t = typeof v.t === 'number' ? v.t : nowMs();
+    if (v.del) return { id: id, t: t, name: v.name || '', del: true, by: v.by || '' };
+    var m = { id: id, t: t, name: v.name || '', text: v.text || '', pic: v.pic || '', voice: v.voice || '' };
+    if (v.stk) m.stk = true;
+    if (v.gif) m.gif = v.gif;
+    if (v.file) m.file = v.file;
+    if (v.reply) m.reply = v.reply;
+    if (v.rx) m.rx = v.rx;
+    return m;
   }
-  function stopPolling() { if (timer) { clearTimeout(timer); timer = null; } }
+
+  // What is stored in Firebase for a message (everything except its id)
+  function nodeOf(m, t) {
+    var n = { t: t, name: m.name };
+    if (m.del) { n.del = true; n.by = m.by || ''; return n; }
+    if (m.text) n.text = String(m.text).slice(0, 4000);
+    if (m.pic) n.pic = m.pic;
+    if (m.stk) n.stk = true;
+    if (m.gif) n.gif = m.gif;
+    if (m.voice) n.voice = m.voice;
+    if (m.file && m.file.id) n.file = { id: m.file.id, name: String(m.file.name || 'document'), size: Number(m.file.size) || 0 };
+    if (m.reply && m.reply.id) n.reply = { id: Number(m.reply.id), name: String(m.reply.name || ''), text: String(m.reply.text || '').slice(0, 140) };
+    if (m.rx) n.rx = m.rx;
+    return n;
+  }
+
+  // Writes a finished message to Firebase. It appears at once; "Sending…" shows until Firebase confirms.
+  function fbSend(m) {
+    var id = newId();
+    m.name = me;
+    unsent[id] = true;
+    stopTyping();
+    return fb.ref('msgs/' + K(id)).set(nodeOf(m, TS)).then(function () {
+      delete unsent[id]; paintStatus();
+    }).catch(function (err) {
+      delete unsent[id]; paintStatus();
+      setStatus('Not sent: ' + errText(err));
+    });
+  }
+
+  var liveRef = null, addBuf = [], addTimer = null, firstFlush = false, cacheTimer = null;
+
+  function saveCacheSoon() {
+    clearTimeout(cacheTimer);
+    cacheTimer = setTimeout(saveCache, 400);
+  }
+
+  // Listens to every loaded message and anything newer: new messages, reactions and deletions
+  function attachLive() {
+    if (liveRef) liveRef.off();
+    liveRef = fb.ref('msgs').orderByKey().startAt(K(firstRow || 0));
+    liveRef.on('child_added', onLive);
+    liveRef.on('child_changed', onLive);
+  }
+
+  function onLive(snap) {
+    var m = toMsg(snap.key, snap.val());
+    if (!(m.id > 0)) return;
+    var old = byId[m.id];
+    if (old) { syncMsg(old, m); return; }
+    addBuf.push(m);
+    if (!addTimer) addTimer = setTimeout(flushAdds, 0);
+  }
+
+  function flushAdds() {
+    addTimer = null;
+    var buf = addBuf; addBuf = [];
+    // The same message can be announced twice (once locally, once confirmed): keep the newest copy
+    var latest = {};
+    buf.forEach(function (m) { latest[m.id] = m; });
+    var list = Object.keys(latest).map(function (k) { return latest[k]; }).filter(function (m) { return !byId[m.id]; });
+    list.sort(function (a, b) { return a.id - b.id; });
+    var fresh = list.filter(function (m) { return m.id > lastRow; });
+    var late = list.filter(function (m) { return !(m.id > lastRow); });
+    var force = firstFlush; firstFlush = false;
+    if (fresh.length) addMessages({ items: fresh }, force);
+    late.forEach(insertLate);
+    updateMyState();
+  }
+
+  // A message that belongs before ones already shown (two people sending at the same instant)
+  function insertLate(m) {
+    if (byId[m.id]) return;
+    items.push(m); items.sort(function (a, b) { return a.id - b.id; });
+    var row = buildRow(m), list = $('list'), rows = list.querySelectorAll('.row[data-row]'), before = null;
+    for (var i = 0; i < rows.length; i++) {
+      if (Number(rows[i].getAttribute('data-row')) > m.id) { before = rows[i]; break; }
+    }
+    var empty = $('empty'); if (empty) empty.remove();
+    if (before) list.insertBefore(row, before); else list.appendChild(row);
+    if (!firstRow || m.id < firstRow) firstRow = m.id;
+    paintStatus(); paintPins(); saveCacheSoon();
+  }
+
+  // Brings a shown message up to date with what Firebase now holds
+  function syncMsg(old, m) {
+    if (m.del) { if (!old.del) { markDeleted(m.id, m.by); saveCacheSoon(); } return; }
+    if (old.del) return;
+    old.t = m.t;
+    if (JSON.stringify(old.rx || {}) !== JSON.stringify(m.rx || {})) { applyRx(m.id, m.rx || {}); saveCacheSoon(); }
+  }
+
+  // Tells the other person how far I have received and seen
+  var myD = 0, myS = 0;
+  function updateMyState() {
+    if (!fb || !me || !lastRow) return;
+    var u = {};
+    if (lastRow > myD) { u.d = lastRow; myD = lastRow; }
+    if (!document.hidden && lastRow > myS) { u.s = lastRow; myS = lastRow; }
+    if (u.d || u.s) fb.ref('state/' + me).update(u).catch(function () {});
+  }
+
+  function setOnline() {
+    if (!fb || !me) return;
+    fb.ref('state/' + me).update(document.hidden ? { on: false, ls: TS } : { on: true, ls: TS }).catch(function () {});
+  }
+
+  // Typing: a time stamp that is renewed while I type and removed when I stop
+  var typingAt = 0, tyTimer = null, otTimer = null;
+  function touchTyping() {
+    if (!fb || !me) return;
+    if (!msgIn.value) { stopTyping(); return; }
+    if (Date.now() - typingAt > 3000) { typingAt = Date.now(); fb.ref('state/' + me + '/ty').set(TS).catch(function () {}); }
+    clearTimeout(tyTimer);
+    tyTimer = setTimeout(stopTyping, 4000);
+  }
+  function stopTyping() {
+    clearTimeout(tyTimer);
+    if (!typingAt) return;
+    typingAt = 0;
+    if (fb && me) fb.ref('state/' + me + '/ty').remove().catch(function () {});
+  }
+
+  function onOtherState(snap) {
+    var v = snap.val() || {};
+    var age = v.ty ? nowMs() - v.ty : 1e9;
+    var typing = age < 7000;
+    clearTimeout(otTimer);
+    if (typing) otTimer = setTimeout(function () { setOtherTyping(false); }, Math.max(500, 7000 - age));
+    addMessages({ status: { delivered: v.d || 0, seen: v.s || 0 }, other: { online: !!v.on, seen: v.ls || 0 }, typing: typing });
+  }
+
+  function onPins(snap) {
+    var list = [];
+    snap.forEach(function (c) { var p = c.val(); if (p && p.id) list.push(p); });
+    list.sort(function (a, b) { return (a.at || 0) - (b.at || 0); });
+    addMessages({ pins: list });
+    if (!$('panel').classList.contains('hidden') && panelMode === 'pins') showPins();
+  }
+
+  // Starts everything once Firebase has confirmed who is signed in
+  function boot() {
+    fb.ref('.info/serverTimeOffset').on('value', function (s) { srvOffset = Number(s.val()) || 0; });
+    fb.ref('.info/connected').on('value', function (s) {
+      if (s.val() !== true) { if (lastRow) setStatus('No connection. Waiting to reconnect…', true); return; }
+      if ($('status').getAttribute('data-net')) setStatus('');
+      // If the app or connection drops, Firebase itself marks me offline
+      fb.ref('state/' + me).onDisconnect().update({ on: false, ls: TS, ty: null });
+      setOnline();
+    });
+    fb.ref('state/' + partner()).on('value', onOtherState);
+    fb.ref('pins').on('value', onPins);
+    fb.ref('meta/migrated').once('value').then(function (s) {
+      if (s.val() !== true) return migrate();
+    }).catch(function () {}).then(loadInitial);
+  }
+
+  function loadInitial() {
+    if (!me) return;
+    firstFlush = true;
+    if (lastRow) { attachLive(); return; } // the saved copy is on screen; the listener brings it up to date
+    fb.ref('msgs').orderByKey().limitToLast(PAGE).once('value').then(function (snap) {
+      var arr = [];
+      snap.forEach(function (c) { arr.push(toMsg(c.key, c.val())); });
+      if (arr.length < PAGE) noOlder = true;
+      addMessages({ items: arr }, true);
+      updateMyState();
+      attachLive();
+    }).catch(function (err) { setStatus('Could not load messages: ' + errText(err)); });
+  }
+
+  // Stops listening (on sign-out)
+  function unboot() {
+    if (!fb) return;
+    if (liveRef) { liveRef.off(); liveRef = null; }
+    try {
+      fb.ref('.info/serverTimeOffset').off(); fb.ref('.info/connected').off();
+      fb.ref('pins').off(); USERS.forEach(function (u) { fb.ref('state/' + u).off(); });
+    } catch (e) {}
+    clearTimeout(addTimer); addTimer = null; addBuf = [];
+    clearTimeout(cacheTimer); clearTimeout(tyTimer); clearTimeout(otTimer);
+    typingAt = 0; myD = 0; myS = 0;
+  }
+
+  // One time only: copies the messages from the old Google Sheet into Firebase
+  function migrate() {
+    setStatus('Copying your earlier messages. This happens once…');
+    return api('exportAll', { pass: pass }).then(function (res) {
+      var all = (res && res.items) || [], chunks = [], i;
+      for (i = 0; i < all.length; i += 200) chunks.push(all.slice(i, i + 200));
+      var chain = Promise.resolve();
+      chunks.forEach(function (part) {
+        chain = chain.then(function () {
+          var up = {};
+          part.forEach(function (m) { if (m && m.id > 0) up['msgs/' + K(m.id)] = nodeOf(m, m.t || 0); });
+          return fb.ref().update(up);
+        });
+      });
+      return chain.then(function () {
+        var up = { 'meta/migrated': true };
+        ((res && res.pins) || []).forEach(function (p) {
+          if (p && p.id > 0) up['pins/' + K(p.id)] = { id: p.id, name: p.name || '', text: p.text || '', t: p.t || 0, at: p.t || 0 };
+        });
+        return fb.ref().update(up);
+      });
+    }).then(function () { setStatus(''); }).catch(function (err) {
+      setStatus('Earlier messages could not be copied yet: ' + errText(err));
+    });
+  }
+
   document.addEventListener('visibilitychange', function () {
-    if (!document.hidden && pass) { seenRow = lastRow; hotUntil = Date.now() + 30000; poll(); startPolling(); }
+    if (!me) return;
+    setOnline();
+    if (document.hidden) stopTyping(); else updateMyState();
   });
-  window.addEventListener('online', poll);
 
   // ---------- Replying ----------
   function setReply(r) {
@@ -1486,14 +1776,21 @@
     list.addEventListener('touchcancel', end);
   })();
 
+  // The send button takes the place of the camera and microphone once there is something to send
+  function updateComposer() {
+    var has = !!(msgIn.value.trim() || pendingPic || pendingFile);
+    $('sendBtn').classList.toggle('hidden', !has);
+    $('camBtn').classList.toggle('hidden', has);
+    $('micBtn').classList.toggle('hidden', has);
+  }
+
   // ---------- Sending ----------
   var msgIn = $('msgIn');
   msgIn.addEventListener('input', function () {
     msgIn.style.height = 'auto';
     msgIn.style.height = Math.min(msgIn.scrollHeight, 120) + 'px';
-    typedAt = Date.now();
-    hotUntil = Math.max(hotUntil, Date.now() + 8000);
-    if (!typingSent) poll(); // let the other person know straight away
+    updateComposer();
+    touchTyping();
   });
   msgIn.addEventListener('keydown', function (ev) {
     // On a computer, Enter sends and Shift+Enter makes a new line
@@ -1501,24 +1798,36 @@
   });
   $('sendBtn').addEventListener('click', send);
 
-  // Shows the message at once, then sends it in the background, one at a time
+  // Text, stickers and GIFs go straight to Firebase. Pictures, voice messages and documents
+  // are first saved to Google Drive (shown as "Sending…"), then the message is written.
   function send() {
     var text = msgIn.value.trim();
     if (!text && !pendingPic && !pendingFile) return;
     typedAt = 0;
-    enqueue({ text: text, pic: pendingPic, voice: '', reply: replyTo, doc: pendingFile });
+    post({ text: text, pic: pendingPic, voice: '', reply: replyTo, doc: pendingFile });
     clearDoc();
     setReply(null);
     msgIn.value = ''; msgIn.style.height = 'auto';
     clearPic();
+    updateComposer();
   }
 
-  function enqueue(job) {
-    var row = document.createElement('div'); row.className = 'row mine pending' + (job.sticker ? ' stk' : '');
+  function post(job) {
+    if (!fb || !me) return;
+    if (job.voice || job.doc || job.pic) { queueJob(job); return; }
+    var m = { text: job.text || '', reply: job.reply || null };
+    if (job.sticker) { m.pic = job.sticker; m.stk = true; }
+    if (job.gif) m.gif = job.gif;
+    fbSend(m);
+    scrollSoon();
+  }
+
+  function scrollSoon() { setTimeout(scrollDown, 30); }
+
+  function queueJob(job) {
+    var row = document.createElement('div'); row.className = 'row mine pending';
     var b = document.createElement('div'); b.className = 'bubble';
     if (job.reply) b.appendChild(makeQuote(job.reply));
-    if (job.gif) { var gi = document.createElement('img'); gi.className = 'pic gifimg'; gi.alt = 'GIF being sent'; gi.src = job.gif; b.appendChild(gi); }
-    if (job.sticker) { var si = document.createElement('img'); si.className = 'stkimg'; si.alt = 'Sticker being sent'; if (picCache[job.sticker]) si.src = picCache[job.sticker]; b.appendChild(si); }
     if (job.pic) { var im = document.createElement('img'); im.className = 'pic'; im.alt = 'Picture being sent'; im.src = job.pic; b.appendChild(im); }
     if (job.doc) b.appendChild(fileCard(job.doc.name, sizeLabel(job.doc.size)));
     if (job.voice) { var v = document.createElement('div'); v.className = 'text'; v.textContent = 'Voice message'; b.appendChild(v); }
@@ -1529,9 +1838,7 @@
     $('list').appendChild(row);
     scrollDown();
     job.el = row;
-    pendingEls.push(row);
     queue.push(job);
-    hotUntil = Date.now() + 30000;
     setStatus('');
     pump();
   }
@@ -1548,28 +1855,31 @@
       fr.readAsDataURL(job.doc);
     });
     ready.then(function (file) {
-      return api('sendMessage', { pass: pass, name: me, text: job.text, pic: job.pic, voice: job.voice, reply: job.reply || null, file: file, sticker: job.sticker || '', gif: job.gif || '' });
-    }).then(function () {
+      return api('upload', { pass: pass, name: me, pic: job.pic || '', voice: job.voice || '', file: file });
+    }).then(function (res) {
       sending = false; queue.shift();
-      poll();
+      res = res || {};
+      // Keep my own copy so the picture or voice message shows without downloading it again
+      if (res.pic && job.pic) { picCache[res.pic] = job.pic; picSave(res.pic, job.pic); }
+      if (res.voice && job.voice) { picCache[res.voice] = job.voice; picSave(res.voice, job.voice); }
+      if (job.el.parentNode) job.el.parentNode.removeChild(job.el);
+      fbSend({ text: job.text || '', reply: job.reply || null, pic: res.pic || '', voice: res.voice || '', file: res.file || null });
+      scrollSoon();
       pump();
     }).catch(function (err) {
       sending = false;
       // Give up on everything waiting, and put the typed text back so nothing is lost
       var lost = queue; queue = [];
-      lost.forEach(function (j) {
-        var i = pendingEls.indexOf(j.el); if (i !== -1) pendingEls.splice(i, 1);
-        if (j.el.parentNode) j.el.parentNode.removeChild(j.el);
-      });
+      lost.forEach(function (j) { if (j.el.parentNode) j.el.parentNode.removeChild(j.el); });
       if (isWrongPass(err)) { signOut('Please sign in again.'); return; }
       var texts = lost.map(function (j) { return j.text; }).filter(Boolean).join('\n');
-      if (texts && !msgIn.value) msgIn.value = texts;
+      if (texts && !msgIn.value) { msgIn.value = texts; updateComposer(); }
       setStatus('Not sent: ' + errText(err) + '. Please send again.');
     });
   }
 
   // ---------- Voice messages ----------
-  var rec = null, recStream = null, recChunks = [], recTimer = null, recStart = 0, recSendIt = false, REC_MAX = 120;
+  var rec = null, recStream = null, recChunks = [], recTimer = null, recStart = 0, recSendIt = false, REC_MAX = 3600; // a safety stop after one hour
 
   function recMime() {
     var types = ['audio/mp4', 'audio/webm;codecs=opus', 'audio/webm', 'audio/ogg'];
@@ -1593,7 +1903,7 @@
       try { rec = new MediaRecorder(stream, opts); } catch (e) { rec = new MediaRecorder(stream); }
       rec.ondataavailable = function (ev) { if (ev.data && ev.data.size) recChunks.push(ev.data); };
       rec.onstop = recDone;
-      rec.start();
+      rec.start(1000);
       recStart = Date.now();
       setStatus('');
       $('composer').classList.add('hidden');
@@ -1630,7 +1940,7 @@
     fr.onload = function () {
       var b64 = String(fr.result).split('base64,')[1] || '';
       if (!b64) { setStatus('The recording was empty. Please try again.'); return; }
-      enqueue({ text: '', pic: '', voice: 'data:' + type + ';base64,' + b64, reply: replyTo });
+      post({ text: '', pic: '', voice: 'data:' + type + ';base64,' + b64, reply: replyTo });
       setReply(null);
     };
     fr.readAsDataURL(new Blob(chunks, { type: type }));
@@ -1643,6 +1953,7 @@
   function clearDoc() {
     pendingFile = null; $('docIn').value = '';
     $('docbar').classList.add('hidden');
+    updateComposer();
   }
 
   $('docIn').addEventListener('change', function () {
@@ -1654,6 +1965,7 @@
     $('docName').textContent = f.name + ' (' + sizeLabel(f.size) + ')';
     $('docbar').classList.remove('hidden');
     setStatus('');
+    updateComposer();
   });
 
   // ---------- Choosing a picture ----------
@@ -1661,8 +1973,9 @@
   $('removePic').addEventListener('click', clearPic);
 
   function clearPic() {
-    pendingPic = ''; $('fileIn').value = '';
+    pendingPic = ''; $('fileIn').value = ''; $('capIn').value = '';
     $('preview').classList.add('hidden'); $('previewImg').removeAttribute('src');
+    updateComposer();
   }
 
   $('fileIn').addEventListener('change', function () {
@@ -1694,6 +2007,7 @@
         $('previewImg').src = pendingPic;
         $('preview').classList.remove('hidden');
         setStatus('');
+        updateComposer();
       };
       fr.readAsDataURL(f);
       return;
@@ -1714,6 +2028,7 @@
       $('previewImg').src = pendingPic;
       $('preview').classList.remove('hidden');
       setStatus('');
+      updateComposer();
     };
     img.onerror = function () {
       URL.revokeObjectURL(url);
@@ -1722,31 +2037,22 @@
     img.src = url;
   }
 
-  // ---------- Start: open straight into the saved chat ----------
+  // ---------- Start ----------
   (function () {
     notifyOn = false; // notifications are switched off in this version
-    var n = known(load('chatName')), p = load('chatPass');
-    if (!(n && p)) { showLogin(API ? '' : 'The app link is not set yet. Put your /exec link in config.js.'); return; }
-    me = n; pass = p;
-    openChat();
-    resetList();
-    var saved = null;
-    try { saved = JSON.parse(load('chatCache') || 'null'); } catch (e) {}
-    if (saved && saved.items && saved.items.length) {
-      addMessages({ items: saved.items, last: saved.last, status: { delivered: saved.d, seen: saved.s } }, true);
-      // Old saved copies have no reaction marker; 0 makes the server send what was missed or ask for a reload
-      rv = typeof saved.rv === 'number' ? saved.rv : 0;
-      startPolling();
-      poll();
-    } else {
-      api('getMessages', { pass: p, after: 0, name: n, seen: 0 }).then(function (res) {
-        addMessages(res, true);
-        startPolling();
-      }).catch(function (err) {
-        if (isWrongPass(err)) signOut('Please sign in again.');
-        else { setStatus('Connection problem. Trying again…', true); startPolling(); }
-      });
-    }
+    // config.js may hold the block exactly as copied from Firebase (const firebaseConfig = {...})
+    var cfg = window.FIREBASE_CONFIG || (typeof firebaseConfig !== 'undefined' ? firebaseConfig : null);
+    if (!window.firebase) { showLogin('The app could not load. Check your internet and reopen it.'); return; }
+    if (!cfg || !cfg.databaseURL) { showLogin('Firebase is not set up yet. Paste the firebaseConfig block into config.js.'); return; }
+    try {
+      firebase.initializeApp(cfg);
+      auth = firebase.auth(); fb = firebase.database();
+      TS = firebase.database.ServerValue.TIMESTAMP;
+    } catch (e) { showLogin('The app could not start: ' + errText(e)); return; }
+    // Open straight into the saved chat; Firebase then confirms the sign-in and goes live
+    var n = known(load('chatName'));
+    if (n && load('chatPass')) enter(n);
+    auth.onAuthStateChanged(onAuth);
   })();
 
   if ('serviceWorker' in navigator) {
