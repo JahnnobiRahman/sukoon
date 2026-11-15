@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Sukoon</title>
-<meta name="theme-color" content="#16243b">
+<meta name="theme-color" content="#12222a">
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -44,7 +44,7 @@
   header .grow { flex: 1; min-width: 0; }
   header .title { font-weight: 700; font-size: 17px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   header .who.typing { color: var(--amber); opacity: 1; font-weight: 600; }
-  header .who.online { color: #6ddc8b; opacity: 1; font-weight: 600; }
+  header .who.online { color: #8fd9b0; opacity: 1; font-weight: 600; }
   header .who { font-size: 12px; opacity: .8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .hbtn { flex: none; width: 38px; height: 38px; border-radius: 50%; border: 0; background: transparent; cursor: pointer; display: flex; align-items: center; justify-content: center; }
   .hbtn svg { width: 21px; height: 21px; }
@@ -55,9 +55,9 @@
   #selbar { background: var(--navy-2); color: #fff; padding: calc(10px + env(safe-area-inset-top)) 12px 10px 16px; display: flex; align-items: center; gap: 8px; border-bottom: 3px solid var(--amber); min-height: 63px; }
   #selbar b { flex: 1; font-size: 16px; }
   #selbar button { border: 1px solid rgba(255,255,255,.45); background: transparent; color: #fff; border-radius: 8px; padding: 8px 12px; font-size: 14px; cursor: pointer; }
-  #selDelete { background: #c5221f !important; border-color: #c5221f !important; font-weight: 600; }
+  #selDelete { background: #b9544e !important; border-color: #b9544e !important; font-weight: 600; }
   #selDelete:disabled { opacity: .5; }
-  .row.sel { background: rgba(224,160,48,.28); border-radius: 10px; }
+  .row.sel { background: var(--selrow); border-radius: 10px; }
   .selecting .rbtn { visibility: hidden; }
   #pinbar { display: flex; align-items: center; gap: 8px; width: 100%; text-align: left; border: 0; background: #fff; border-bottom: 1px solid var(--line); padding: 8px 14px; font-size: 13px; cursor: pointer; color: var(--ink); }
   #pinbar svg { flex: none; width: 16px; height: 16px; }
@@ -155,6 +155,35 @@
   .item span { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; overflow-wrap: anywhere; }
   .item button { flex: none; border: 0; background: #edf0f4; border-radius: 8px; padding: 6px 10px; font-size: 13px; cursor: pointer; }
   .note { text-align: center; color: var(--muted); font-size: 14px; margin-top: 30px; padding: 0 20px; }
+  /* Profiles */
+  .avatar { background-size: cover; background-position: center; cursor: pointer; }
+  header .grow { cursor: pointer; }
+  #prof { align-items: stretch; }
+  #prof .box { width: 100%; max-width: 760px; background: var(--bg); display: flex; flex-direction: column; }
+  #prof .top { background: var(--navy); color: #fff; display: flex; align-items: center; gap: 8px; padding: calc(10px + env(safe-area-inset-top)) 10px 10px 16px; border-bottom: 3px solid var(--amber); }
+  #prof .top b { flex: 1; font-size: 17px; }
+  #prof .top button { border: 1px solid rgba(255,255,255,.4); background: transparent; color: #fff; border-radius: 8px; padding: 6px 10px; font-size: 13px; cursor: pointer; }
+  #profBody { flex: 1; overflow-y: auto; padding: 14px 12px 24px; }
+  .pcard { background: var(--surface); border-radius: 16px; padding: 20px 16px; margin-bottom: 14px; text-align: center; }
+  .plabel { font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-bottom: 12px; }
+  .pav { width: 112px; height: 112px; border-radius: 50%; margin: 0 auto 10px; background: var(--amber) center / cover no-repeat; color: var(--navy); font-size: 46px; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+  .pav.has { cursor: zoom-in; }
+  .pname { font-size: 20px; font-weight: 700; }
+  .pabout { margin-top: 6px; color: var(--soft-ink); overflow-wrap: anywhere; }
+  .pabout.none { color: var(--muted); font-style: italic; }
+  .pseen { margin-top: 6px; font-size: 13px; color: var(--muted); }
+  .prow { display: flex; gap: 8px; justify-content: center; margin: 12px 0 4px; }
+  .prow button { border: 0; background: var(--soft); color: var(--soft-ink); border-radius: 10px; padding: 9px 14px; cursor: pointer; font-size: 14px; }
+  .pcard label { display: block; text-align: left; font-size: 13px; font-weight: 600; margin: 14px 0 6px; }
+  .pcard input { width: 100%; padding: 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--bg); color: var(--ink); }
+  .pcard .primary { margin-top: 12px; }
+  #themes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  #themes button { border: 2px solid transparent; border-radius: 12px; padding: 8px 6px; cursor: pointer; background: var(--soft); color: var(--soft-ink); font-size: 12px; }
+  #themes button.on { border-color: var(--amber); color: var(--ink); }
+  #themes i { display: flex; height: 26px; border-radius: 8px; overflow: hidden; margin-bottom: 6px; }
+  #themes i span { flex: 1; }
+  #profMsg { min-height: 18px; margin-top: 8px; font-size: 13px; color: var(--muted); }
+
   /* Stickers */
   .row.stk .bubble { background: transparent; box-shadow: none; padding: 2px 4px; }
   .stkimg { display: block; width: 140px; height: 140px; object-fit: contain; cursor: pointer; }
@@ -166,12 +195,12 @@
   #stkTop .tab { background: transparent !important; color: var(--muted) !important; font-size: 15px; font-weight: 700; padding: 7px 8px; border-bottom: 2px solid transparent; border-radius: 0; }
   #stkTop .tab.on { color: var(--ink) !important; border-bottom-color: var(--amber); }
   #stkTop button { border: 0; border-radius: 8px; padding: 7px 12px; font-size: 13px; cursor: pointer; }
-  #stkEdit.on { background: #c5221f !important; color: #fff !important; }
+  #stkEdit.on { background: #b9544e !important; color: #fff !important; }
   #stkGrid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
   #stkGrid button { position: relative; aspect-ratio: 1; border: 0; border-radius: 12px; padding: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 12px; overflow: hidden; }
   #stkGrid img { width: 100%; height: 100%; object-fit: contain; }
   #stkGrid .add { font-size: 30px; border: 1px dashed var(--line); background: transparent; color: var(--muted); }
-  #stkGrid.editing button:not(.add)::after { content: '\00D7'; position: absolute; top: 2px; right: 2px; width: 20px; height: 20px; line-height: 20px; border-radius: 50%; background: #c5221f; color: #fff; font-size: 15px; }
+  #stkGrid.editing button:not(.add)::after { content: '\00D7'; position: absolute; top: 2px; right: 2px; width: 20px; height: 20px; line-height: 20px; border-radius: 50%; background: #b9544e; color: #fff; font-size: 15px; }
   #stkNote { grid-column: 1 / -1; color: var(--muted); font-size: 13px; padding: 4px 2px; }
   #stkHead { margin: 14px 0 8px; font-size: 13px; color: var(--muted); font-weight: 600; }
   #emoGrid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 4px; }
@@ -191,9 +220,12 @@
   /* ---------- Dark mode ---------- */
   :root {
     color-scheme: dark;
-    --navy: #16243b; --navy-2: #9db7e6; --amber: #e0a030;
-    --bg: #0e141c; --mine: #1d4a7c; --theirs: #1c2735; --ink: #e7ecf3; --muted: #93a0b4; --line: #2e3b4e;
-    --surface: #18222f; --soft: #243245; --soft-ink: #c3cddc;
+/* Default colours (Dusk blue). The app replaces these with the theme chosen in Profiles.
+       --amber is the accent colour, kept under its old name. */
+    --navy: #131c2b; --navy-2: #a9c2ea; --amber: #8fb0e0;
+    --bg: #0c1119; --mine: #24406b; --theirs: #1a2331; --ink: #e6ecee; --muted: #8f9ca3; --line: #2a3547;
+    --surface: #151d29; --soft: #212c3c; --soft-ink: #c0cbd0;
+    --link: #9cc3f5; --seen: #8fb8f0; --chipme: #1f3050; --selbar: #1e3252; --selrow: rgba(143,176,224,.24); --onaccent: #0e1a1d;
   }
   .card, #pinbar, #replybar, #sheet .box, #attach .box, #stk .box, .item, .chip, #who2 button, #micBtn, #stkBtn, #attBtn, #camBtn, #docbar,
   #composer textarea, .card input, #searchForm input, #gifForm input { background: var(--surface); color: var(--ink); }
@@ -203,14 +235,16 @@
   .quote { background: rgba(255,255,255,.09); }
   .quote span, #replybar span { color: var(--soft-ink); }
   .picwait { background: rgba(255,255,255,.07); }
-  .text a { color: #8ab8ff; }
-  .stat.seen { color: #6cb0ff; }
-  .chip.me, #emojis button.on { background: #3a2f14; }
+  .text a { color: var(--link); }
+  .stat.seen { color: var(--seen); }
+  .chip.me, #emojis button.on { background: var(--chipme); }
   .act { border-top-color: #263244; }
-  #loginErr, #status { color: #ff8a80; }
+  #loginErr, #status { color: #f0a59c; }
   #status.info { color: var(--soft-ink); }
-  #sendBtn, .primary, #recSend, #searchForm button, #gifForm button, #who2 button.on { background: var(--amber); border-color: var(--amber); color: #14202f; }
-  #selbar { background: #22395c; }
+  #sendBtn, .primary, #recSend, #searchForm button, #gifForm button, #who2 button.on { background: var(--amber); border-color: var(--amber); color: var(--onaccent); }
+  #selbar { background: var(--selbar); }
+  #pinbar svg, .file svg { color: var(--amber); }
+  #sendBtn svg { color: var(--onaccent); }
   .shade { background: rgba(0,0,0,.6); }
   .bubble { box-shadow: 0 1px 2px rgba(0,0,0,.35); }
   @keyframes flash { 0%, 60% { box-shadow: 0 0 0 3px var(--amber); } 100% { box-shadow: 0 1px 2px rgba(0,0,0,.35); } }
@@ -252,7 +286,7 @@
     <button id="logoutBtn" type="button">Sign out</button>
   </header>
   <button id="pinbar" class="hidden" type="button">
-    <svg viewBox="0 0 24 24" fill="none" stroke="#e0a030" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4h6l-1 6 3 3H7l3-3z"/><path d="M12 13v7"/></svg>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4h6l-1 6 3 3H7l3-3z"/><path d="M12 13v7"/></svg>
     <span id="pinText"></span><em id="pinCount"></em>
   </button>
   <div id="list"></div>
@@ -277,14 +311,14 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="#c3cddc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8.5 14.5a4.5 4.5 0 0 0 7 0"/><path d="M9 9.5v.5M15 9.5v.5"/></svg>
     </button>
     <textarea id="msgIn" rows="1" placeholder="Message" maxlength="4000"></textarea>
-    <button class="round" id="camBtn" type="button" aria-label="Send a photo">
+    <button class="round" id="camBtn" type="button" aria-label="Take a photo with the camera">
       <svg viewBox="0 0 24 24" fill="none" stroke="#c3cddc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/><circle cx="12" cy="13" r="3.5"/></svg>
     </button>
     <button class="round" id="micBtn" type="button" aria-label="Record a voice message">
       <svg viewBox="0 0 24 24" fill="none" stroke="#c3cddc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>
     </button>
     <button class="round hidden" id="sendBtn" type="button" aria-label="Send">
-      <svg viewBox="0 0 24 24" fill="#14202f"><path d="M3 20l18-8L3 4v6l12 2-12 2z"/></svg>
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 20l18-8L3 4v6l12 2-12 2z"/></svg>
     </button>
   </div>
   <div id="recbar" class="hidden">
@@ -356,6 +390,37 @@
   </div>
 </div>
 
+<!-- Profiles: pictures and status lines -->
+<div id="prof" class="shade hidden">
+  <div class="box">
+    <div class="top"><b>Profiles</b><button id="profClose" type="button">Close</button></div>
+    <div id="profBody">
+      <div class="pcard">
+        <div class="pav" id="pavOther"></div>
+        <div class="pname" id="pnameOther"></div>
+        <div class="pabout" id="paboutOther"></div>
+        <div class="pseen" id="pseenOther"></div>
+      </div>
+      <div class="pcard">
+        <div class="plabel">Your profile</div>
+        <div class="pav" id="pavMe"></div>
+        <div class="pname" id="pnameMe"></div>
+        <div class="prow">
+          <button id="profPhoto" type="button">Change photo</button>
+          <button id="profNoPhoto" type="button">Remove photo</button>
+        </div>
+        <label for="aboutIn">Status line</label>
+        <input id="aboutIn" maxlength="80" autocomplete="off" placeholder="A short line about you">
+        <button class="primary" id="aboutSave" type="button">Save status</button>
+        <div id="profMsg"></div>
+        <label>Colour theme (only on this phone)</label>
+        <div id="themes"></div>
+      </div>
+    </div>
+  </div>
+</div>
+<input id="profIn" type="file" accept="image/*" class="hidden">
+
 <div id="viewer" class="hidden"><img id="viewerImg" alt="Picture"></div>
 
 <script src="config.js"></script>
@@ -380,6 +445,31 @@
   var typedAt = 0, typingSent = false, otherTyping = false;
   var swipe = null, swipedAt = 0;
   var selecting = false, selected = {}, delArmed = 0;
+  var profiles = {};
+  // Colour themes: [accent, my bubble, background, header, their bubble, surface, soft, line, name colour, link, seen, my-reaction, select bar]
+  var THEMES = {
+    'Dusk blue': ['#8fb0e0', '#24406b', '#0c1119', '#131c2b', '#1a2331', '#151d29', '#212c3c', '#2a3547', '#a9c2ea', '#9cc3f5', '#8fb8f0', '#1f3050', '#1e3252'],
+    'Ocean teal': ['#79c2bd', '#1d4750', '#0c1418', '#12222a', '#19262d', '#152127', '#20313a', '#283940', '#9fd0cf', '#8fd0e2', '#86d3ce', '#1d3b3b', '#1b3a42'],
+    'Lavender': ['#b3a4e0', '#3a3266', '#100f18', '#1a1828', '#201e2d', '#1a1826', '#282538', '#322f45', '#c5b9ea', '#c0b3f0', '#b9a9ee', '#2c2750', '#2e2852'],
+    'Sage': ['#9cc0a0', '#2c4a38', '#0e1411', '#16211b', '#1b2620', '#161f1a', '#223028', '#2b3a31', '#b4d2b7', '#a9d3bf', '#a3cfa8', '#233a2c', '#24402f'],
+    'Graphite': ['#c9d1d9', '#33404d', '#0f1114', '#181b20', '#1c2026', '#171a1f', '#252a31', '#30363d', '#d5dbe1', '#9ecbff', '#9ecbff', '#2b323b', '#2a3038'],
+    'Rose dusk': ['#d8a7b5', '#5a3040', '#140f12', '#21171c', '#261c21', '#1f171b', '#30232a', '#3b2c33', '#e3bcc7', '#e8b4c4', '#e0aabb', '#452a35', '#4a2c38']
+  };
+  var THEME_VARS = ['--amber', '--mine', '--bg', '--navy', '--theirs', '--surface', '--soft', '--line', '--navy-2', '--link', '--seen', '--chipme', '--selbar'];
+  var themeName = 'Dusk blue';
+
+  function applyTheme(name) {
+    var t = THEMES[name]; if (!t) { name = 'Dusk blue'; t = THEMES[name]; }
+    themeName = name;
+    var st = document.documentElement.style;
+    THEME_VARS.forEach(function (v, i) { st.setProperty(v, t[i]); });
+    var m = /^#(..)(..)(..)$/.exec(t[0]);
+    st.setProperty('--selrow', 'rgba(' + parseInt(m[1], 16) + ',' + parseInt(m[2], 16) + ',' + parseInt(m[3], 16) + ',.24)');
+    var meta = document.querySelector('meta[name="theme-color"]'); if (meta) meta.setAttribute('content', t[3]);
+    var bs = document.querySelectorAll('#themes button');
+    for (var i = 0; i < bs.length; i++) bs[i].className = bs[i].getAttribute('data-theme') === name ? 'on' : '';
+  }
+  try { applyTheme(localStorage.getItem('chatTheme') || 'Dusk blue'); } catch (e) { applyTheme('Dusk blue'); }
   var fb = null, auth = null, TS = null, srvOffset = 0, lastOwnId = 0, noOlder = false, unsent = {};
   var PAGE = 300, entered = false, booted = false, loginMsg = '', searchAll = null, searchAt = 0;
   var replyTo = null, loadingOlder = false, rv = null, pv = -1, pins = [], sheetMsg = null;
@@ -485,6 +575,7 @@
   function enter(n) {
     if (entered && me === n) return;
     me = n; pass = load('chatPass'); entered = true;
+    try { profiles = JSON.parse(load('chatProfiles') || '{}') || {}; } catch (e) { profiles = {}; }
     openChat();
     resetList();
     var saved = null;
@@ -516,7 +607,7 @@
   }
 
   function showLogin(msg) {
-    closeSheet(); closePanel(); endSelect(); closeStk(); closeAttach();
+    closeSheet(); closePanel(); endSelect(); closeStk(); closeAttach(); closeProf();
     $('chat').classList.add('hidden');
     $('login').classList.remove('hidden');
     setPick(load('chatName'));
@@ -526,7 +617,7 @@
 
   function signOut(msg) {
     loginMsg = msg || '';
-    store('chatPass', null); store('chatCache', null);
+    store('chatPass', null); store('chatCache', null); store('chatProfiles', null);
     picWipe(); picCache = {};
     pass = '';
     var done = function () {
@@ -561,7 +652,16 @@
   function setTitle() {
     var nm = otherName || partner() || 'Sukoon';
     $('title').textContent = nm;
-    $('avatar').textContent = nm.charAt(0).toUpperCase();
+    paintAvatar($('avatar'), partner() || nm);
+  }
+
+  // Shows a person's profile picture in a round frame, or their initial when they have none
+  function paintAvatar(el, name) {
+    var p = profiles[name] || {};
+    var ok = typeof p.img === 'string' && p.img.indexOf('data:image/') === 0;
+    el.style.backgroundImage = ok ? 'url("' + p.img + '")' : '';
+    el.textContent = ok ? '' : String(name || 'S').charAt(0).toUpperCase();
+    el.classList.toggle('has', ok);
   }
 
   function saveCache() {
@@ -701,7 +801,7 @@
       otherDelivered = nd; otherSeen = ns;
     }
     if (res.pins) { pins = res.pins; paintPins(); }
-    if (res.other) { presence = res.other; paintWho(); }
+    if (res.other) { presence = res.other; paintWho(); if (!$('prof').classList.contains('hidden')) paintProf(false); }
     if (typeof res.typing === 'boolean') setOtherTyping(res.typing);
     if (incoming.length) setOtherTyping(false);
     paintStatus();
@@ -896,7 +996,7 @@
 
   function fileCard(name, note) {
     var card = document.createElement('div'); card.className = 'file';
-    card.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="#e0a030" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/></svg>';
+    card.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/></svg>';
     var d = document.createElement('div');
     var nm = document.createElement('b'); nm.textContent = name;
     var sm = document.createElement('small'); sm.textContent = note;
@@ -1212,7 +1312,8 @@
   $('attClose').addEventListener('click', closeAttach);
   $('attach').addEventListener('click', function (ev) { if (ev.target === $('attach')) closeAttach(); });
   $('picBtn').addEventListener('click', closeAttach);
-  $('camBtn').addEventListener('click', function () { $('fileIn').click(); });
+  // The camera button opens the phone's camera straight away; photos from the gallery are under +
+  $('camBtn').addEventListener('click', function () { $('capIn').click(); });
   $('capBtn').addEventListener('click', function () { closeAttach(); $('capIn').click(); });
   $('capIn').addEventListener('change', function () { var f = this.files && this.files[0]; if (f) usePicture(f); });
   $('docBtn').addEventListener('click', closeAttach);
@@ -1294,6 +1395,89 @@
     if (row) row.parentNode.replaceChild(buildRow(gone), row); else byId[id] = gone;
     if (replyTo && replyTo.id === id) setReply(null);
   }
+
+  // ---------- Colour theme picker ----------
+  Object.keys(THEMES).forEach(function (name) {
+    var t = THEMES[name];
+    var b = document.createElement('button'); b.type = 'button'; b.setAttribute('data-theme', name);
+    var sw = document.createElement('i');
+    [t[2], t[4], t[1], t[0]].forEach(function (c) { var sp = document.createElement('span'); sp.style.background = c; sw.appendChild(sp); });
+    b.appendChild(sw); b.appendChild(document.createTextNode(name));
+    b.addEventListener('click', function () { applyTheme(name); store('chatTheme', name); });
+    $('themes').appendChild(b);
+  });
+  applyTheme(themeName);
+
+  // ---------- Profiles ----------
+  function onProfiles(snap) {
+    profiles = snap.val() || {};
+    store('chatProfiles', JSON.stringify(profiles));
+    setTitle();
+    if (!$('prof').classList.contains('hidden')) paintProf(false);
+  }
+
+  function paintProf(fillInput) {
+    var other = partner(), po = profiles[other] || {}, pm = profiles[me] || {};
+    paintAvatar($('pavOther'), other); paintAvatar($('pavMe'), me);
+    $('pnameOther').textContent = other; $('pnameMe').textContent = me;
+    $('paboutOther').textContent = po.about || 'No status line yet';
+    $('paboutOther').className = 'pabout' + (po.about ? '' : ' none');
+    $('pseenOther').textContent = presence && presence.online ? 'online' : presence && presence.seen ? seenLabel(presence.seen) : '';
+    $('profNoPhoto').classList.toggle('hidden', !pm.img);
+    if (fillInput) { $('aboutIn').value = pm.about || ''; $('profMsg').textContent = ''; }
+  }
+
+  function openProf() { if (!me) return; paintProf(true); $('prof').classList.remove('hidden'); }
+  function closeProf() { $('prof').classList.add('hidden'); }
+  $('avatar').addEventListener('click', openProf);
+  document.querySelector('header .grow').addEventListener('click', openProf);
+  $('profClose').addEventListener('click', closeProf);
+
+  ['pavOther', 'pavMe'].forEach(function (id) {
+    $(id).addEventListener('click', function () {
+      var p = profiles[id === 'pavMe' ? me : partner()] || {};
+      if (p.img) { $('viewerImg').src = p.img; $('viewer').classList.remove('hidden'); }
+    });
+  });
+
+  function profNote(msg) { $('profMsg').textContent = msg; }
+
+  $('aboutSave').addEventListener('click', function () {
+    var text = $('aboutIn').value.trim().slice(0, 80);
+    profNote('Saving…');
+    fb.ref('profile/' + me + '/about').set(text || null)
+      .then(function () { profNote('Status saved.'); })
+      .catch(function (err) { profNote('Could not save: ' + errText(err)); });
+  });
+
+  $('profPhoto').addEventListener('click', function () { $('profIn').click(); });
+  $('profNoPhoto').addEventListener('click', function () {
+    fb.ref('profile/' + me + '/img').remove()
+      .then(function () { profNote('Photo removed.'); })
+      .catch(function (err) { profNote('Could not remove: ' + errText(err)); });
+  });
+
+  // The photo is cut to a square from the middle and made small, so it loads instantly
+  $('profIn').addEventListener('change', function () {
+    var f = this.files && this.files[0];
+    this.value = '';
+    if (!f) return;
+    var url = URL.createObjectURL(f), img = new Image();
+    img.onload = function () {
+      var side = Math.min(img.naturalWidth, img.naturalHeight), size = 256;
+      var c = document.createElement('canvas'); c.width = size; c.height = size;
+      var ctx = c.getContext('2d');
+      ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, size, size);
+      ctx.drawImage(img, (img.naturalWidth - side) / 2, (img.naturalHeight - side) / 2, side, side, 0, 0, size, size);
+      URL.revokeObjectURL(url);
+      profNote('Saving photo…');
+      fb.ref('profile/' + me + '/img').set(c.toDataURL('image/jpeg', 0.8))
+        .then(function () { profNote('Photo saved.'); })
+        .catch(function (err) { profNote('Could not save the photo: ' + errText(err)); });
+    };
+    img.onerror = function () { URL.revokeObjectURL(url); profNote('That picture could not be opened. Try another one.'); };
+    img.src = url;
+  });
 
   // ---------- Pinned messages ----------
   function setPin(id, on) {
@@ -1661,6 +1845,7 @@
     });
     fb.ref('state/' + partner()).on('value', onOtherState);
     fb.ref('pins').on('value', onPins);
+    fb.ref('profile').on('value', onProfiles);
     fb.ref('meta/migrated').once('value').then(function (s) {
       if (s.val() !== true) return migrate();
     }).catch(function () {}).then(loadInitial);
@@ -1686,7 +1871,7 @@
     if (liveRef) { liveRef.off(); liveRef = null; }
     try {
       fb.ref('.info/serverTimeOffset').off(); fb.ref('.info/connected').off();
-      fb.ref('pins').off(); USERS.forEach(function (u) { fb.ref('state/' + u).off(); });
+      fb.ref('pins').off(); fb.ref('profile').off(); USERS.forEach(function (u) { fb.ref('state/' + u).off(); });
     } catch (e) {}
     clearTimeout(addTimer); addTimer = null; addBuf = [];
     clearTimeout(cacheTimer); clearTimeout(tyTimer); clearTimeout(otTimer);
