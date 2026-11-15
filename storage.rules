@@ -1,0 +1,27 @@
+rules_version = '2';
+
+// Firebase Storage rules for Sukoon.
+// Paste this into Firebase console > Storage > Rules and click Publish.
+// Only the two chat members (signed in as mh@sukoon.chat / jh@sukoon.chat) can see or add files.
+service firebase.storage {
+  match /b/{bucket}/o {
+    function member() {
+      return request.auth != null
+        && request.auth.token.email in ['mh@sukoon.chat', 'jh@sukoon.chat'];
+    }
+
+    match /m/{kind}/{fileId} {
+      allow read: if member();
+      // New files only (no overwriting), up to 25 MB, and only in the three folders the app uses
+      allow create: if member()
+        && kind in ['pic', 'voice', 'file']
+        && request.resource.size < 25 * 1024 * 1024;
+      allow delete: if member();
+    }
+
+    // Everything else is closed
+    match /{everything=**} {
+      allow read, write: if false;
+    }
+  }
+}

@@ -427,6 +427,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-storage-compat.js"></script>
 <script>
   var API = (window.CHAT_API || '').trim();
   var USERS = ['MH', 'JH'], pick = '';
@@ -470,7 +471,7 @@
     for (var i = 0; i < bs.length; i++) bs[i].className = bs[i].getAttribute('data-theme') === name ? 'on' : '';
   }
   try { applyTheme(localStorage.getItem('chatTheme') || 'Dusk blue'); } catch (e) { applyTheme('Dusk blue'); }
-  var fb = null, auth = null, TS = null, srvOffset = 0, lastOwnId = 0, noOlder = false, unsent = {};
+  var fb = null, auth = null, st = null, stOk = true, TS = null, srvOffset = 0, lastOwnId = 0, noOlder = false, unsent = {};
   var PAGE = 300, entered = false, booted = false, loginMsg = '', searchAll = null, searchAt = 0;
   var replyTo = null, loadingOlder = false, rv = null, pv = -1, pins = [], sheetMsg = null;
 
@@ -931,11 +932,71 @@
   }
 
   // ---------- Pictures and voice inside messages ----------
+  // Files saved in Firebase Storage have ids that start with "m/"; older ones live in Google Drive
+  function inStorage(id) { return String(id || '').indexOf('m/') === 0; }
+
   function fetchMedia(id) {
     if (picCache[id]) return Promise.resolve(picCache[id]);
+    if (inStorage(id)) {
+      // A direct link: the phone downloads and caches the file itself, with no Apps Script in between
+      return picLoad(id).then(function (saved) {
+        if (saved) { picCache[id] = saved; return saved; } // my own upload, kept on this phone
+        if (!st) throw new Error('Storage is not available');
+        return st.ref(id).getDownloadURL().then(function (url) { picCache[id] = url; return url; });
+      });
+    }
     return picLoad(id).then(function (saved) {
       if (saved) { picCache[id] = saved; return saved; }
       return api('getPicture', { pass: pass, id: id }).then(function (src) { picSave(id, src); picCache[id] = src; return src; });
+    });
+  }
+
+  // Saves a picture, voice message or document to Firebase Storage and returns its id
+  function storeMedia(kind, data, ext, type, fileName) {
+    var id = 'm/' + kind + '/' + Date.now() + '_' + Math.random().toString(36).slice(2, 10) + (ext ? '.' + ext : '');
+    var meta = { cacheControl: 'private, max-age=31536000', customMetadata: { by: me } };
+    if (type) meta.contentType = type;
+    if (fileName) meta.contentDisposition = 'attachment; filename*=UTF-8\'\'' + encodeURIComponent(fileName);
+    var task = typeof data === 'string' ? st.ref(id).putString(data, 'data_url', meta) : st.ref(id).put(data, meta);
+    return task.then(function () { return id; });
+  }
+
+  function extOf(type, name) {
+    var m = /\.([a-z0-9]{1,8})$/i.exec(String(name || ''));
+    if (m) return m[1].toLowerCase();
+    var t = String(type || '').split(';')[0];
+    return ({ 'image/jpeg': 'jpg', 'image/png': 'png', 'audio/mp4': 'm4a', 'audio/webm': 'webm', 'audio/ogg': 'ogg', 'audio/mpeg': 'mp3' })[t] || '';
+  }
+  function typeOfDataUrl(src) { var s = String(src || ''); return s.indexOf('data:') === 0 ? s.slice(5, s.search(/[;,]/)) : ''; }
+
+  // Uploads everything in one job to Storage; same result shape as the old Apps Script 'upload'
+  function uploadToStorage(job) {
+    var res = {}, steps = [];
+    if (job.pic) steps.push(storeMedia('pic', job.pic, 'jpg', 'image/jpeg').then(function (id) { res.pic = id; }));
+    if (job.voice) {
+      var vt = typeOfDataUrl(job.voice);
+      steps.push(storeMedia('voice', job.voice, extOf(vt), vt).then(function (id) { res.voice = id; }));
+    }
+    if (job.doc) {
+      var d = job.doc;
+      steps.push(storeMedia('file', d, extOf(d.type, d.name), d.type || 'application/octet-stream', d.name).then(function (id) {
+        res.file = { id: id, name: d.name, size: d.size };
+      }));
+    }
+    return Promise.all(steps).then(function () { return res; });
+  }
+
+  // The older way: everything goes through the Apps Script to Google Drive
+  function uploadToDrive(job) {
+    // A document is read from the phone just before it is sent
+    var ready = !job.doc ? Promise.resolve(null) : new Promise(function (res, rej) {
+      var fr = new FileReader();
+      fr.onload = function () { res({ name: job.doc.name, type: job.doc.type || '', data: String(fr.result) }); };
+      fr.onerror = function () { rej(new Error('the document could not be read from this phone')); };
+      fr.readAsDataURL(job.doc);
+    });
+    return ready.then(function (file) {
+      return api('upload', { pass: pass, name: me, pic: job.pic || '', voice: job.voice || '', file: file });
     });
   }
 
@@ -1007,9 +1068,13 @@
   function makeFile(f) {
     var touch = ('ontouchstart' in window) || navigator.maxTouchPoints > 0;
     var note = sizeLabel(f.size) + ' \u00B7 tap to download';
-    var card = fileCard(f.name, note), busyDl = false, ready = null;
+    var card = fileCard(f.name, note), busyDl = false, ready = null, dlUrl = '';
     var sm = card.querySelector('small');
 
+    function openLink(url) {
+      var a = document.createElement('a'); a.href = url; a.download = f.name; a.rel = 'noopener';
+      document.body.appendChild(a); a.click(); a.remove();
+    }
     function saveByLink() {
       var url = URL.createObjectURL(ready);
       var a = document.createElement('a'); a.href = url; a.download = f.name; a.rel = 'noopener';
@@ -1029,6 +1094,20 @@
     card.addEventListener('click', function () {
       if (selecting || busyDl) return;
       if (ready) { deliver(); return; }
+      if (inStorage(f.id)) {
+        // Storage hands the file straight to the phone or browser as a download
+        if (dlUrl) { openLink(dlUrl); return; }
+        busyDl = true; sm.textContent = 'Getting the file…';
+        fetchMedia(f.id).then(function (url) {
+          dlUrl = url; busyDl = false;
+          if (touch) sm.textContent = sizeLabel(f.size) + ' · ready, tap to open or save';
+          else { sm.textContent = sizeLabel(f.size) + ' · tap to save again'; openLink(url); }
+        }).catch(function (err) {
+          busyDl = false; sm.textContent = note;
+          setStatus('Could not download: ' + errText(err));
+        });
+        return;
+      }
       busyDl = true; sm.textContent = 'Downloading…';
       api('getPicture', { pass: pass, id: f.id }).then(function (src) {
         // Turn the received text back into the real file
@@ -1376,8 +1455,10 @@
     endSelect();
     if (!Object.keys(up).length) return;
     fb.ref().update(up).then(function () {
-      // The picture, voice or document file goes to the Google Drive bin
-      if (files.length) api('trash', { pass: pass, ids: files }).catch(function () {});
+      // Files in Firebase Storage are deleted there; older ones go to the Google Drive bin
+      var drive = files.filter(function (id) { return !inStorage(id); });
+      files.filter(inStorage).forEach(function (id) { if (st) st.ref(id).delete().catch(function () {}); });
+      if (drive.length) api('trash', { pass: pass, ids: drive }).catch(function () {});
     }).catch(function (err) { setStatus('Could not delete: ' + errText(err)); });
   });
 
@@ -1984,7 +2065,7 @@
   $('sendBtn').addEventListener('click', send);
 
   // Text, stickers and GIFs go straight to Firebase. Pictures, voice messages and documents
-  // are first saved to Google Drive (shown as "Sending…"), then the message is written.
+  // are first saved to Firebase Storage (or Google Drive, if Storage is off), then the message is written.
   function send() {
     var text = msgIn.value.trim();
     if (!text && !pendingPic && !pendingFile) return;
@@ -2032,16 +2113,14 @@
     if (sending || !queue.length) return;
     sending = true;
     var job = queue[0];
-    // A document is read from the phone just before it is sent
-    var ready = !job.doc ? Promise.resolve(null) : new Promise(function (res, rej) {
-      var fr = new FileReader();
-      fr.onload = function () { res({ name: job.doc.name, type: job.doc.type || '', data: String(fr.result) }); };
-      fr.onerror = function () { rej(new Error('the document could not be read from this phone')); };
-      fr.readAsDataURL(job.doc);
-    });
-    ready.then(function (file) {
-      return api('upload', { pass: pass, name: me, pic: job.pic || '', voice: job.voice || '', file: file });
-    }).then(function (res) {
+    // Firebase Storage first (fast, direct). If it is not switched on for this project, use Google Drive as before.
+    var upload = (st && stOk) ? uploadToStorage(job).catch(function (err) {
+      var c = String(err && err.code || '');
+      if (!/storage\/(unknown|bucket-not-found|project-not-found|unauthorized|unauthenticated|quota-exceeded|retry-limit-exceeded)/.test(c)) throw err;
+      stOk = false; // remember for this session, so later sends go straight to Drive
+      return uploadToDrive(job);
+    }) : uploadToDrive(job);
+    upload.then(function (res) {
       sending = false; queue.shift();
       res = res || {};
       // Keep my own copy so the picture or voice message shows without downloading it again
@@ -2233,6 +2312,7 @@
       firebase.initializeApp(cfg);
       auth = firebase.auth(); fb = firebase.database();
       TS = firebase.database.ServerValue.TIMESTAMP;
+      try { if (cfg.storageBucket && firebase.storage) st = firebase.storage(); } catch (e) { st = null; }
     } catch (e) { showLogin('The app could not start: ' + errText(e)); return; }
     // Open straight into the saved chat; Firebase then confirms the sign-in and goes live
     var n = known(load('chatName'));
